@@ -1,17 +1,11 @@
-import CMap_Base from './CMapJS/CMap_Base.js';
-import CMap0 from './CMapJS/CMap0.js';
-import CMap1 from './CMapJS/CMap1.js';
-import CMap2 from './CMapJS/CMap2.js';
+import {CMap0} from './CMapJS/CMap/CMap.js';
+import {CMap1} from './CMapJS/CMap/CMap.js';
+import {CMap2} from './CMapJS/CMap/CMap.js';
+import {CMap3} from './CMapJS/CMap/CMap.js';
 import Renderer from './CMapJS/Renderer.js';
 import * as THREE from './CMapJS/three.module.js';
 import {OrbitControls} from './CMapJS/OrbitsControls.js';
-// import CMap3 as CMap.CMap3 from './CMapJS/CMap.js';
 
-let cmb = new CMap_Base;
-
-console.log(cmb)
-cmb.delete_map();
-console.log(cmb)
 
 let cmap0 = new CMap0();
 const dart = CMap0.dart;
