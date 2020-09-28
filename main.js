@@ -5,7 +5,8 @@ import {CMap3} from './CMapJS/CMap/CMap.js';
 import Renderer from './CMapJS/Renderer.js';
 import * as THREE from './CMapJS/three.module.js';
 import {OrbitControls} from './CMapJS/OrbitsControls.js';
-
+import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
+import {tetrahedron_off} from './off_files.js';
 
 let cmap0 = new CMap0();
 const dart = CMap0.dart;
@@ -42,21 +43,7 @@ pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
-let tmap = new CMap2();
-let fd0 = tmap.add_face(3);
-let fd1 = tmap.add_face(3);
-tmap.sew_phi2(fd0, fd1);
-tmap.close(true);
-
-tmap.set_embeddings(1);
-tmap.set_embeddings(3);
-
-let p = tmap.add_attribute(1, "position");
-p[tmap.cell(1, fd0)] = new THREE.Vector3(-1, -1, 0);
-p[tmap.cell(1, fd1)] = new THREE.Vector3(1, 1, 0);
-p[tmap.cell(1, tmap.phi_1[fd0])] = new THREE.Vector3(-1, 1, -0.5);
-p[tmap.cell(1, tmap.phi_1[fd1])] = new THREE.Vector3(1, -1, -0.5);
-
+let cmap2 = load_cmap2('off', tetrahedron_off);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xA0A0A0);
@@ -88,7 +75,7 @@ renderer1.vertices.create({size: 0.025}).add(scene);
 renderer1.edges.create().add(scene);
 // renderer1.vertices.add(scene);
 
-let renderer2 = new Renderer(tmap);
+let renderer2 = new Renderer(cmap2);
 renderer2.vertices.create({size: 0.025}).add(scene);
 renderer2.edges.create().add(scene);
 renderer2.faces.create().add(scene);
