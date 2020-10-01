@@ -22,10 +22,10 @@ position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
 position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
 position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
 
-cmap0.foreach(1,
-	d => {
-		cmap0.foreach_dart_of(1, d, d1 => console.log(cmap0.cell(1, d), d1));
-	})
+// cmap0.foreach(1,
+// 	d => {
+// 		cmap0.foreach_dart_of(1, d, d1 => console.log(cmap0.cell(1, d), d1));
+// 	})
 
 let cmap1 = new CMap1();
 let f00 = cmap1.add_face(6);
@@ -43,7 +43,39 @@ pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
-let cmap2 = load_cmap2('off', tetrahedron_off);
+// let cmap2 = load_cmap2('off', tetrahedron_off);
+let cmap2 = new CMap2;
+cmap2.set_embeddings(cmap2.vertex);
+cmap2.set_embeddings(cmap2.edge);
+cmap2.set_embeddings(cmap2.face);
+cmap2.set_embeddings(cmap2.volume);
+let bd = cmap2.add_prism(4, true);
+let bd2 = cmap2.phi2[cmap2.phi1[cmap2.phi1[cmap2.phi2[bd]]]];
+console.log(bd, bd2);
+let pos2 = cmap2.add_attribute(cmap2.vertex, "position");
+// cmap2.set_embeddings(cmap2.vertex);
+
+cmap2.debug();
+console.log(pos2);
+pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(0.2, 0.2, -0.2);
+bd = cmap2.phi1[bd];
+pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(0.2, -0.2, -0.2);
+bd = cmap2.phi1[bd];
+pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(-0.2, -0.2, -0.2);
+bd = cmap2.phi1[bd];
+pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(-0.2, 0.2, -0.2);
+
+pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(0.2, -0.2, 0.2);
+bd2 = cmap2.phi1[bd2];
+pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(0.2, 0.2, 0.2);
+bd2 = cmap2.phi1[bd2];
+pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(-0.2, 0.2, 0.2);
+bd2 = cmap2.phi1[bd2];
+pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(-0.2, -0.2, 0.2);
+
+console.log(pos2);
+
+cmap2.debug();
 
 let cmap3 = new CMap3();
 
