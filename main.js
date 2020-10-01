@@ -45,6 +45,38 @@ pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
 let cmap2 = load_cmap2('off', tetrahedron_off);
 
+let cmap3 = new CMap3();
+
+
+
+// cmap2.foreach_dart_phi1_phi2(0, d=> {
+// 	console.log(d);
+// 	return d == 12
+// });
+
+
+// let tmap = new CMap2();
+// let fd0 = tmap.add_face(3);
+// let fd1 = tmap.add_face(3);
+// tmap.sew_phi2(fd0, fd1);
+// tmap.close_hole(1, false, true);
+
+// tmap.set_embeddings(1);
+// tmap.set_embeddings(3);
+
+// let p = tmap.add_attribute(1, "position");
+// p[tmap.cell(1, fd0)] = new THREE.Vector3(-1, -1, 0);
+// p[tmap.cell(1, fd1)] = new THREE.Vector3(1, 1, 0);
+// p[tmap.cell(1, tmap.phi_1[fd0])] = new THREE.Vector3(-1, 1, -0.5);
+// p[tmap.cell(1, tmap.phi_1[fd1])] = new THREE.Vector3(1, -1, -0.5);
+
+
+
+
+
+
+
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xA0A0A0);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000.0);
@@ -65,7 +97,6 @@ pointLight.position.set(10,10,10);
 scene.add(pointLight);
 
 
-
 let renderer0 = new Renderer(cmap0);
 renderer0.vertices.create({size: 0.025}).add(scene);
 // renderer0.vertices.add(scene);
@@ -79,6 +110,11 @@ let renderer2 = new Renderer(cmap2);
 renderer2.vertices.create({size: 0.025}).add(scene);
 renderer2.edges.create().add(scene);
 renderer2.faces.create().add(scene);
+
+// let renderert = new Renderer(tmap);
+// renderert.vertices.create({size: 0.025}).add(scene);
+// renderert.edges.create().add(scene);
+// renderert.faces.create().add(scene);
 
 function update ()
 {
@@ -103,4 +139,5 @@ loop();
 // export {cmap0};
 window.renderer0 = renderer0;
 window.cmap0 = cmap0;
+window.cmap3 = cmap3;
 window.CMap0 = CMap0;
