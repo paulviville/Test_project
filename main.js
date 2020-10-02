@@ -44,40 +44,68 @@ pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
 // let cmap2 = load_cmap2('off', tetrahedron_off);
-let cmap2 = new CMap2;
-cmap2.set_embeddings(cmap2.vertex);
-cmap2.set_embeddings(cmap2.edge);
-cmap2.set_embeddings(cmap2.face);
-cmap2.set_embeddings(cmap2.volume);
-let bd = cmap2.add_prism(4, true);
-let bd2 = cmap2.phi2[cmap2.phi1[cmap2.phi1[cmap2.phi2[bd]]]];
-console.log(bd, bd2);
-let pos2 = cmap2.add_attribute(cmap2.vertex, "position");
+
+
+let cmap3 = new CMap3;
+
+
+
 // cmap2.set_embeddings(cmap2.vertex);
+// cmap2.set_embeddings(cmap2.edge);
+// cmap2.set_embeddings(cmap2.face);
+// cmap2.set_embeddings(cmap2.volume);
+let bd = cmap3.add_prism(4, true);
+let bd1 = cmap3.add_prism(4, true);
+let bd2 = cmap3.phi2[cmap3.phi1[cmap3.phi1[cmap3.phi2[bd]]]];
+let bd3 = cmap3.phi2[cmap3.phi1[cmap3.phi1[cmap3.phi2[bd1]]]];
 
-cmap2.debug();
+cmap3.sew_phi3(bd1, bd2);
+bd1 = cmap3.phi1[bd1];
+bd2 = cmap3.phi_1[bd2];
+cmap3.sew_phi3(bd1, bd2);
+bd1 = cmap3.phi1[bd1];
+bd2 = cmap3.phi_1[bd2];
+cmap3.sew_phi3(bd1, bd2);
+bd1 = cmap3.phi1[bd1];
+bd2 = cmap3.phi_1[bd2];
+cmap3.sew_phi3(bd1, bd2);
+bd1 = cmap3.phi1[bd1];
+bd2 = cmap3.phi_1[bd2];
+console.log(bd, bd2);
+let pos2 = cmap3.add_attribute(cmap3.vertex, "position");
+cmap3.close();
+cmap3.set_embeddings(cmap3.vertex);
+cmap3.debug();
 console.log(pos2);
-pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(0.2, 0.2, -0.2);
-bd = cmap2.phi1[bd];
-pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(0.2, -0.2, -0.2);
-bd = cmap2.phi1[bd];
-pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(-0.2, -0.2, -0.2);
-bd = cmap2.phi1[bd];
-pos2[cmap2.cell(cmap2.vertex, bd)] = new THREE.Vector3(-0.2, 0.2, -0.2);
+pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(0.2, 0.2, -0.2);
+bd = cmap3.phi1[bd];
+pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(0.2, -0.2, -0.2);
+bd = cmap3.phi1[bd];
+pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(-0.2, -0.2, -0.2);
+bd = cmap3.phi1[bd];
+pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(-0.2, 0.2, -0.2);
 
-pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(0.2, -0.2, 0.2);
-bd2 = cmap2.phi1[bd2];
-pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(0.2, 0.2, 0.2);
-bd2 = cmap2.phi1[bd2];
-pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(-0.2, 0.2, 0.2);
-bd2 = cmap2.phi1[bd2];
-pos2[cmap2.cell(cmap2.vertex, bd2)] = new THREE.Vector3(-0.2, -0.2, 0.2);
+pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(0.2, -0.2, 0.2);
+bd2 = cmap3.phi1[bd2];
+pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(0.2, 0.2, 0.2);
+bd2 = cmap3.phi1[bd2];
+pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.2, 0.2, 0.2);
+bd2 = cmap3.phi1[bd2];
+pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.2, -0.2, 0.2);
+
+pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(0.2, -0.2, 0.6);
+bd3 = cmap3.phi1[bd3];
+pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(0.2, 0.2, 0.6);
+bd3 = cmap3.phi1[bd3];
+pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(-0.2, 0.2, 0.6);
+bd3 = cmap3.phi1[bd3];
+pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(-0.2, -0.2, 0.6);
+
 
 console.log(pos2);
 
-cmap2.debug();
+cmap3.debug();
 
-let cmap3 = new CMap3();
 
 
 
@@ -138,10 +166,11 @@ renderer1.vertices.create({size: 0.025}).add(scene);
 renderer1.edges.create().add(scene);
 // renderer1.vertices.add(scene);
 
-let renderer2 = new Renderer(cmap2);
+let renderer2 = new Renderer(cmap3);
 renderer2.vertices.create({size: 0.025}).add(scene);
 renderer2.edges.create().add(scene);
-renderer2.faces.create().add(scene);
+renderer2.volumes.create().add(scene);
+// renderer2.faces.create().add(scene);
 
 // let renderert = new Renderer(tmap);
 // renderert.vertices.create({size: 0.025}).add(scene);
