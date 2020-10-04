@@ -91,7 +91,7 @@ pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(0.2, 0.2, 0.2);
 bd2 = cmap3.phi1[bd2];
 pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.2, 0.2, 0.2);
 bd2 = cmap3.phi1[bd2];
-pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.2, -0.2, 0.2);
+pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.3, -0.3, 0.2);
 
 pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(0.2, -0.2, 0.6);
 bd3 = cmap3.phi1[bd3];
@@ -152,9 +152,12 @@ orbit_controls.addEventListener('change', render);
 
 let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
 scene.add(ambientLight);
-let pointLight = new THREE.PointLight(0xFFEEDD, 0.8);
-pointLight.position.set(10,10,10);
-scene.add(pointLight);
+let pointLight0 = new THREE.PointLight(0xFFEEDD, 0.8);
+pointLight0.position.set(10,8,5);
+let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
+pointLight1.position.set(-10,-8,-5);
+scene.add(pointLight0);
+scene.add(pointLight1);
 
 
 let renderer0 = new Renderer(cmap0);
@@ -198,7 +201,7 @@ function loop()
 loop();
 
 // export {cmap0};
-window.renderer0 = renderer0;
+window.renderer2 = renderer2;
 window.cmap0 = cmap0;
 window.cmap3 = cmap3;
 window.CMap0 = CMap0;
