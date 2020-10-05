@@ -6,7 +6,9 @@ import Renderer from './CMapJS/Renderer.js';
 import * as THREE from './CMapJS/three.module.js';
 import {OrbitControls} from './CMapJS/OrbitsControls.js';
 import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
+import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
 import {tetrahedron_off} from './off_files.js';
+import {test0_mesh} from './mesh_files.js';
 
 let cmap0 = new CMap0();
 const dart = CMap0.dart;
@@ -131,7 +133,7 @@ cmap3.debug();
 // p[tmap.cell(1, tmap.phi_1[fd1])] = new THREE.Vector3(1, -1, -0.5);
 
 
-
+let cmap_mesh = load_cmap3("mesh", test0_mesh);
 
 
 
