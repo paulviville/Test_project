@@ -8,7 +8,7 @@ import {OrbitControls} from './CMapJS/OrbitsControls.js';
 import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
 import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
 import {tetrahedron_off} from './off_files.js';
-import {test1_mesh, fertility, ortho3, cactus, test0_mesh} from './mesh_files.js';
+import {test1_mesh, fertility, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
 
 let cmap0 = new CMap0();
 const dart = CMap0.dart;
@@ -133,13 +133,8 @@ pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 // p[tmap.cell(1, tmap.phi_1[fd1])] = new THREE.Vector3(1, -1, -0.5);
 
 
-let cmap3 = load_cmap3("mesh", fertility);
-
-
-
-
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xA0A0A0);
+scene.background = new THREE.Color(0x000000);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000.0);
 camera.position.set(0, 0, 2);
 const renderer = new THREE.WebGLRenderer();
@@ -149,7 +144,7 @@ document.body.appendChild( renderer.domElement );
 let orbit_controls = new OrbitControls(camera, renderer.domElement)
 orbit_controls.enablePan = false;
 orbit_controls.update();
-orbit_controls.addEventListener('change', render);
+// orbit_controls.addEventListener('change', render);
 
 let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
 scene.add(ambientLight);
@@ -160,22 +155,43 @@ pointLight1.position.set(-10,-8,-5);
 scene.add(pointLight0);
 scene.add(pointLight1);
 
+let clock = new THREE.Clock();
+clock.start();
 
-let renderer0 = new Renderer(cmap0);
-renderer0.vertices.create({size: 0.025}).add(scene);
-// renderer0.vertices.add(scene);
+let cmap3 = load_cmap3("mesh", metatron);
+let load_time = clock.getDelta();
 
-let renderer1 = new Renderer(cmap1);
-renderer1.vertices.create({size: 0.025}).add(scene);
-renderer1.edges.create().add(scene);
+// let pos3 = cmap3.get_attribute(cmap3.vertex, "position");
+// let center = new THREE.Vector3();
+// pos3.forEach(v => center.add(v));
+// center.divideScalar(pos3.length);
+// console.log(center);
+
+
+
+
+// let renderer0 = new Renderer(cmap0);
+// renderer0.vertices.create({size: 0.025}).add(scene);
+// // renderer0.vertices.add(scene);
+
+// let renderer1 = new Renderer(cmap1);
+// renderer1.vertices.create({size: 0.025}).add(scene);
+// renderer1.edges.create().add(scene);
 // renderer1.vertices.add(scene);
+
 
 let renderer2 = new Renderer(cmap3);
 // renderer2.vertices.create({size: 0.025}).add(scene);
 // renderer2.edges.create().add(scene);
 renderer2.volumes.create().add(scene);
+// renderer2.volumes.mesh.position.set(center.x, center.y, center.z);
 // renderer2.faces.create().add(scene);
+let renderer_time = clock.getDelta();
 
+let total_time = load_time + renderer_time;
+console.log("total time: ", total_time);
+console.log("load time: ", load_time);
+console.log("renderer time: ", renderer_time);
 // let renderert = new Renderer(tmap);
 // renderert.vertices.create({size: 0.025}).add(scene);
 // renderert.edges.create().add(scene);
@@ -183,8 +199,13 @@ renderer2.volumes.create().add(scene);
 
 function update ()
 {
-    renderer2.volumes.mesh.rotation.x += 0.05
-    renderer2.volumes.rescale(0.9 + Math.sin(renderer2.volumes.mesh.rotation.x) / 10)
+    renderer2.volumes.mesh.rotation.x += 0.0125
+    renderer2.volumes.mesh.rotation.y -= 0.0075
+    renderer2.volumes.mesh.rotation.z += 0.0025
+    let s = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 2) / 5 + Math.cos(renderer2.volumes.mesh.rotation.y * 15) / 10;
+    renderer2.volumes.rescale(0.8 + s)
+    let s2 = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 2) / 10;
+    renderer2.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
 }
 
 function render()
