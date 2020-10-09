@@ -16,7 +16,7 @@ let d0 = cmap0.new_dart();
 let d1 = cmap0.new_dart();
 let d2 = cmap0.new_dart();
 
-cmap0.create_embedding(cmap0.vertex);
+// cmap0.create_embedding(cmap0.vertex);
 cmap0.set_embeddings(cmap0.vertex);
 let position = cmap0.add_attribute(cmap0.vertex, "position");
 
@@ -149,11 +149,12 @@ orbit_controls.update();
 let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
 scene.add(ambientLight);
 let pointLight0 = new THREE.PointLight(0xFFEEDD, 0.8);
-pointLight0.position.set(10,8,5);
+// pointLight0.position.set(10,8,5);
 let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
-pointLight1.position.set(-10,-8,-5);
+pointLight0.position.set(0, 0, 0);
+// pointLight1.position.set(-10,-8,-5);
 scene.add(pointLight0);
-scene.add(pointLight1);
+// scene.add(pointLight1);
 
 let clock = new THREE.Clock();
 clock.start();
@@ -199,13 +200,15 @@ console.log("renderer time: ", renderer_time);
 
 function update ()
 {
-    renderer2.volumes.mesh.rotation.x += 0.0125
-    renderer2.volumes.mesh.rotation.y -= 0.0075
-    renderer2.volumes.mesh.rotation.z += 0.0025
-    let s = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 2) / 5 + Math.cos(renderer2.volumes.mesh.rotation.y * 15) / 10;
-    renderer2.volumes.rescale(0.8 + s)
-    let s2 = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 2) / 10;
-    renderer2.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
+    renderer2.volumes.mesh.rotation.x += 0.003125
+    renderer2.volumes.mesh.rotation.y += 0.003125
+    // renderer2.volumes.mesh.rotation.x += 0.003125
+    // renderer2.volumes.mesh.rotation.y -= 0.001875
+    // renderer2.volumes.mesh.rotation.z += 0.000625
+    // let s = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer2.volumes.mesh.rotation.y * 30) / 10;
+    // renderer2.volumes.rescale(0.8 + s)
+    // let s2 = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 2) / 10;
+    // renderer2.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
 }
 
 function render()
