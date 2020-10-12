@@ -7,7 +7,7 @@ import * as THREE from './CMapJS/three.module.js';
 import {OrbitControls} from './CMapJS/OrbitsControls.js';
 import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
 import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
-import {tetrahedron_off} from './off_files.js';
+import {tetrahedron_off, cactus_off, fertility_off} from './off_files.js';
 import {test1_mesh, fertility, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
 
 let cmap0 = new CMap0();
@@ -45,8 +45,9 @@ pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
-// let cmap2 = load_cmap2('off', tetrahedron_off);
-
+let cmap2 = load_cmap2('off', fertility_off);
+cmap2.set_embeddings(cmap2.edge);
+cmap2.set_embeddings(cmap2.face);
 
 // let cmap3 = new CMap3;
 
@@ -181,12 +182,12 @@ let load_time = clock.getDelta();
 // renderer1.vertices.add(scene);
 
 
-let renderer2 = new Renderer(cmap3);
-// renderer2.vertices.create({size: 0.025}).add(scene);
-// renderer2.edges.create().add(scene);
-renderer2.volumes.create().add(scene);
-// renderer2.volumes.mesh.position.set(center.x, center.y, center.z);
-// renderer2.faces.create().add(scene);
+let renderer3 = new Renderer(cmap3);
+// renderer3.vertices.create({size: 0.025}).add(scene);
+// renderer3.edges.create().add(scene);
+renderer3.volumes.create().add(scene);
+// renderer3.volumes.mesh.position.set(center.x, center.y, center.z);
+// renderer3.faces.create().add(scene);
 let renderer_time = clock.getDelta();
 
 let total_time = load_time + renderer_time;
@@ -198,17 +199,73 @@ console.log("renderer time: ", renderer_time);
 // renderert.edges.create().add(scene);
 // renderert.faces.create().add(scene);
 
+let renderer2 = new Renderer(cmap2);
+renderer2.faces.create().add(scene);
+
+let iterations = 100;
+
+let average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
+
+let average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
+
+average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
+
+average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
+
+average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
+
+average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
+
 function update ()
 {
-    renderer2.volumes.mesh.rotation.x += 0.003125
-    renderer2.volumes.mesh.rotation.y += 0.003125
-    // renderer2.volumes.mesh.rotation.x += 0.003125
-    // renderer2.volumes.mesh.rotation.y -= 0.001875
-    // renderer2.volumes.mesh.rotation.z += 0.000625
-    // let s = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer2.volumes.mesh.rotation.y * 30) / 10;
-    // renderer2.volumes.rescale(0.8 + s)
-    // let s2 = Math.sin(renderer2.volumes.mesh.rotation.x / Math.PI * 2) / 10;
-    // renderer2.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
+    renderer3.volumes.mesh.rotation.x += 0.003125
+    renderer3.volumes.mesh.rotation.y += 0.003125
+    // renderer3.volumes.mesh.rotation.x += 0.003125
+    // renderer3.volumes.mesh.rotation.y -= 0.001875
+    // renderer3.volumes.mesh.rotation.z += 0.000625
+    // let s = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer3.volumes.mesh.rotation.y * 30) / 10;
+    // renderer3.volumes.rescale(0.8 + s)
+    // let s2 = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 2) / 10;
+    // renderer3.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
 }
 
 function render()
@@ -228,6 +285,9 @@ loop();
 
 // export {cmap0};
 window.renderer2 = renderer2;
+window.renderer3 = renderer3;
 window.cmap0 = cmap0;
+window.cmap1 = cmap1;
+window.cmap2 = cmap2;
 window.cmap3 = cmap3;
 window.CMap0 = CMap0;
