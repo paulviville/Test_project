@@ -45,93 +45,6 @@ pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
-// let cmap2 = load_cmap2('off', fertility_off);
-// cmap2.set_embeddings(cmap2.edge);
-// cmap2.set_embeddings(cmap2.face);
-
-// let cmap3 = new CMap3;
-
-
-
-// // cmap2.set_embeddings(cmap2.vertex);
-// // cmap2.set_embeddings(cmap2.edge);
-// // cmap2.set_embeddings(cmap2.face);
-// // cmap2.set_embeddings(cmap2.volume);
-// let bd = cmap3.add_prism(4, true);
-// let bd1 = cmap3.add_prism(4, true);
-// let bd2 = cmap3.phi2[cmap3.phi1[cmap3.phi1[cmap3.phi2[bd]]]];
-// let bd3 = cmap3.phi2[cmap3.phi1[cmap3.phi1[cmap3.phi2[bd1]]]];
-
-// cmap3.sew_phi3(bd1, bd2);
-// bd1 = cmap3.phi1[bd1];
-// bd2 = cmap3.phi_1[bd2];
-// cmap3.sew_phi3(bd1, bd2);
-// bd1 = cmap3.phi1[bd1];
-// bd2 = cmap3.phi_1[bd2];
-// cmap3.sew_phi3(bd1, bd2);
-// bd1 = cmap3.phi1[bd1];
-// bd2 = cmap3.phi_1[bd2];
-// cmap3.sew_phi3(bd1, bd2);
-// bd1 = cmap3.phi1[bd1];
-// bd2 = cmap3.phi_1[bd2];
-// console.log(bd, bd2);
-// let pos2 = cmap3.add_attribute(cmap3.vertex, "position");
-// cmap3.close();
-// cmap3.set_embeddings(cmap3.vertex);
-// cmap3.debug();
-// console.log(pos2);
-// pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(0.2, 0.2, -0.2);
-// bd = cmap3.phi1[bd];
-// pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(0.2, -0.2, -0.2);
-// bd = cmap3.phi1[bd];
-// pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(-0.2, -0.2, -0.2);
-// bd = cmap3.phi1[bd];
-// pos2[cmap3.cell(cmap3.vertex, bd)] = new THREE.Vector3(-0.2, 0.2, -0.2);
-
-// pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(0.2, -0.2, 0.2);
-// bd2 = cmap3.phi1[bd2];
-// pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(0.2, 0.2, 0.2);
-// bd2 = cmap3.phi1[bd2];
-// pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.2, 0.2, 0.2);
-// bd2 = cmap3.phi1[bd2];
-// pos2[cmap3.cell(cmap3.vertex, bd2)] = new THREE.Vector3(-0.3, -0.3, 0.2);
-
-// pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(0.2, -0.2, 0.6);
-// bd3 = cmap3.phi1[bd3];
-// pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(0.2, 0.2, 0.6);
-// bd3 = cmap3.phi1[bd3];
-// pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(-0.2, 0.2, 0.6);
-// bd3 = cmap3.phi1[bd3];
-// pos2[cmap3.cell(cmap3.vertex, bd3)] = new THREE.Vector3(-0.2, -0.2, 0.6);
-
-
-// console.log(pos2);
-
-// cmap3.debug();
-
-
-
-
-// cmap2.foreach_dart_phi1_phi2(0, d=> {
-// 	console.log(d);
-// 	return d == 12
-// });
-
-
-// let tmap = new CMap2();
-// let fd0 = tmap.add_face(3);
-// let fd1 = tmap.add_face(3);
-// tmap.sew_phi2(fd0, fd1);
-// tmap.close_hole(1, false, true);
-
-// tmap.set_embeddings(1);
-// tmap.set_embeddings(3);
-
-// let p = tmap.add_attribute(1, "position");
-// p[tmap.cell(1, fd0)] = new THREE.Vector3(-1, -1, 0);
-// p[tmap.cell(1, fd1)] = new THREE.Vector3(1, 1, 0);
-// p[tmap.cell(1, tmap.phi_1[fd0])] = new THREE.Vector3(-1, 1, -0.5);
-// p[tmap.cell(1, tmap.phi_1[fd1])] = new THREE.Vector3(1, -1, -0.5);
 
 
 const scene = new THREE.Scene();
@@ -164,6 +77,10 @@ pointLight0.position.set(0, 0, 0);
 // pointLight1.position.set(-10,-8,-5);
 scene.add(pointLight0);
 // scene.add(pointLight1);
+
+let cmap2 = load_cmap2('off', fertility_off);
+cmap2.set_embeddings(cmap2.edge);
+cmap2.set_embeddings(cmap2.face);
 
 let clock = new THREE.Clock();
 clock.start();
@@ -210,98 +127,97 @@ console.log("renderer time: ", renderer_time);
 // let renderer2 = new Renderer(cmap2);
 // renderer2.faces.create().add(scene);
 
-// let iterations = 100;
+let iterations = 100;
 
-// let average_time_0 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
-//     average_time_0 += clock.getDelta();
-// }
-// average_time_0 /= iterations;
+let average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
 
-// let average_time_1 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-//     average_time_1 += clock.getDelta();
-// }
-// average_time_1 /= iterations;
-// console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
+let average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
 
-// average_time_0 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
-//     average_time_0 += clock.getDelta();
-// }
-// average_time_0 /= iterations;
+average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
 
-// average_time_1 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-//     average_time_1 += clock.getDelta();
-// }
-// average_time_1 /= iterations;
-// console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
+average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
 
-// average_time_0 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
-//     average_time_0 += clock.getDelta();
-// }
-// average_time_0 /= iterations;
+average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
 
-// average_time_1 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-//     average_time_1 += clock.getDelta();
-// }
-// average_time_1 /= iterations;
-// console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
+average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
 
-// cmap3.set_embeddings(cmap3.connex)
-// cmap3.set_embeddings(cmap3.face)
-// cmap3.set_embeddings(cmap3.face2)
-// cmap3.set_embeddings(cmap3.edge)
+cmap3.set_embeddings(cmap3.connex)
+cmap3.set_embeddings(cmap3.face)
+cmap3.set_embeddings(cmap3.face2)
+cmap3.set_embeddings(cmap3.edge)
 
-// average_time_0 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;});
-//     average_time_0 += clock.getDelta();
-// }
-// average_time_0 /= iterations;
+average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
 
-// average_time_1 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
-//     average_time_1 += clock.getDelta();
-// }
-// average_time_1 /= iterations;
-// console.log("foreach_incident face to connex times : ", average_time_0, average_time_1);
+average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident face to connex times : ", average_time_0, average_time_1);
 
-// average_time_0 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;});
-//     average_time_0 += clock.getDelta();
-// }
-// average_time_0 /= iterations;
+average_time_0 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;});
+    average_time_0 += clock.getDelta();
+}
+average_time_0 /= iterations;
 
-// average_time_1 = 0;
-// clock.getDelta();
-// for(let i = 0; i < iterations; ++i){
-//     cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
-//     average_time_1 += clock.getDelta();
-// }
-// average_time_1 /= iterations;
-// console.log("foreach_incident vertex to connex times : ", average_time_0, average_time_1);
-
+average_time_1 = 0;
+clock.getDelta();
+for(let i = 0; i < iterations; ++i){
+    cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
+    average_time_1 += clock.getDelta();
+}
+average_time_1 /= iterations;
+console.log("foreach_incident vertex to connex times : ", average_time_0, average_time_1);
 
 
 function update ()
