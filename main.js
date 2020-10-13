@@ -306,15 +306,15 @@ console.log("renderer time: ", renderer_time);
 
 function update ()
 {
-    renderer3.volumes.mesh.rotation.x += 0.003125
-    renderer3.volumes.mesh.rotation.y += 0.003125
     // renderer3.volumes.mesh.rotation.x += 0.003125
-    // renderer3.volumes.mesh.rotation.y -= 0.001875
-    // renderer3.volumes.mesh.rotation.z += 0.000625
-    // let s = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer3.volumes.mesh.rotation.y * 30) / 10;
-    // renderer3.volumes.rescale(0.8 + s)
-    // let s2 = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 2) / 10;
-    // renderer3.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
+    // renderer3.volumes.mesh.rotation.y += 0.003125
+    renderer3.volumes.mesh.rotation.x += 0.003125
+    renderer3.volumes.mesh.rotation.y -= 0.001875
+    renderer3.volumes.mesh.rotation.z += 0.000625
+    let s = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer3.volumes.mesh.rotation.y * 30) / 10;
+    renderer3.volumes.rescale(0.8 + s)
+    let s2 = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 2) / 10;
+    renderer3.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
 }
 
 function render()
