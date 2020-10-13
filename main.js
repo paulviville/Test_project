@@ -45,9 +45,9 @@ pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
 pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
-let cmap2 = load_cmap2('off', fertility_off);
-cmap2.set_embeddings(cmap2.edge);
-cmap2.set_embeddings(cmap2.face);
+// let cmap2 = load_cmap2('off', fertility_off);
+// cmap2.set_embeddings(cmap2.edge);
+// cmap2.set_embeddings(cmap2.face);
 
 // let cmap3 = new CMap3;
 
@@ -199,61 +199,102 @@ console.log("renderer time: ", renderer_time);
 // renderert.edges.create().add(scene);
 // renderert.faces.create().add(scene);
 
-let renderer2 = new Renderer(cmap2);
-renderer2.faces.create().add(scene);
+// let renderer2 = new Renderer(cmap2);
+// renderer2.faces.create().add(scene);
 
-let iterations = 100;
+// let iterations = 100;
 
-let average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// let average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-let average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
+// let average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
 
-average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
 
-average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
+
+// cmap3.set_embeddings(cmap3.connex)
+// cmap3.set_embeddings(cmap3.face)
+// cmap3.set_embeddings(cmap3.face2)
+// cmap3.set_embeddings(cmap3.edge)
+
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
+
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident face to connex times : ", average_time_0, average_time_1);
+
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
+
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident vertex to connex times : ", average_time_0, average_time_1);
+
+
 
 function update ()
 {
@@ -284,10 +325,10 @@ function loop()
 loop();
 
 // export {cmap0};
-window.renderer2 = renderer2;
+// window.renderer2 = renderer2;
 window.renderer3 = renderer3;
 window.cmap0 = cmap0;
 window.cmap1 = cmap1;
-window.cmap2 = cmap2;
+// window.cmap2 = cmap2;
 window.cmap3 = cmap3;
 window.CMap0 = CMap0;
