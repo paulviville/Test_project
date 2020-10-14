@@ -127,97 +127,97 @@ console.log("renderer time: ", renderer_time);
 // let renderer2 = new Renderer(cmap2);
 // renderer2.faces.create().add(scene);
 
-let iterations = 100;
+// let iterations = 100;
 
-let average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// let average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-let average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
+// let average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.vertex, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident vertex to volume times : ", average_time_0, average_time_1);
 
-average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.edge, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident edge to volume times : ", average_time_0, average_time_1);
 
-average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap2.foreach_incident(cmap2.face, cmap2.volume, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident face to volume times : ", average_time_0, average_time_1);
 
-cmap3.set_embeddings(cmap3.connex)
-cmap3.set_embeddings(cmap3.face)
-cmap3.set_embeddings(cmap3.face2)
-cmap3.set_embeddings(cmap3.edge)
+// cmap3.set_embeddings(cmap3.connex)
+// cmap3.set_embeddings(cmap3.face)
+// cmap3.set_embeddings(cmap3.face2)
+// cmap3.set_embeddings(cmap3.edge)
 
-average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident face to connex times : ", average_time_0, average_time_1);
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.face, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident face to connex times : ", average_time_0, average_time_1);
 
-average_time_0 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;});
-    average_time_0 += clock.getDelta();
-}
-average_time_0 /= iterations;
+// average_time_0 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;});
+//     average_time_0 += clock.getDelta();
+// }
+// average_time_0 /= iterations;
 
-average_time_1 = 0;
-clock.getDelta();
-for(let i = 0; i < iterations; ++i){
-    cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
-    average_time_1 += clock.getDelta();
-}
-average_time_1 /= iterations;
-console.log("foreach_incident vertex to connex times : ", average_time_0, average_time_1);
+// average_time_1 = 0;
+// clock.getDelta();
+// for(let i = 0; i < iterations; ++i){
+//     cmap3.foreach_incident(cmap3.vertex, cmap3.connex, 0, vd => {let v = 2 * vd;}, true);
+//     average_time_1 += clock.getDelta();
+// }
+// average_time_1 /= iterations;
+// console.log("foreach_incident vertex to connex times : ", average_time_0, average_time_1);
 
 
 function update ()
