@@ -55,7 +55,7 @@ pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0);
+scene.background = new THREE.Color(0x222222);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000.0);
 camera.position.set(0, 0, 2);
 const renderer = new THREE.WebGLRenderer();
@@ -75,10 +75,10 @@ orbit_controls.enablePan = false;
 orbit_controls.update();
 // orbit_controls.addEventListener('change', render);
 
-let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.5);
+let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
 scene.add(ambientLight);
 let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
-// pointLight0.position.set(10,8,5);
+pointLight0.position.set(10,8,5);
 // let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
 // pointLight0.position.set(0, 0, 0);
 // pointLight1.position.set(-10,-8,-5);
@@ -110,29 +110,29 @@ let renderer2 = new Renderer(cmap2);
 // let cmap3 = load_cmap3("mesh", test1_mesh);
 // let pos3 = cmap3.get_attribute(cmap3.vertex, "position");
 
-// let cache_ed = cmap3.cache(cmap3.edge);
-// console.log(cache_ed)
-// cmap3.foreach(cmap3.edge, ed => {
-//     let p1 = pos3[cmap3.cell(cmap3.vertex, ed)];
-//     let p2 = pos3[cmap3.cell(cmap3.vertex, cmap3.phi2[ed])];
-//     let v3 = cmap3.cut_edge(ed, true);
-//     pos3[cmap3.cell(cmap3.vertex, v3)] = (new THREE.Vector3()).add(p1).add(p2).multiplyScalar(0.5);
+// // let cache_ed = cmap3.cache(cmap3.edge);
+// // console.log(cache_ed)
+// // cmap3.foreach(cmap3.edge, ed => {
+// //     let p1 = pos3[cmap3.cell(cmap3.vertex, ed)];
+// //     let p2 = pos3[cmap3.cell(cmap3.vertex, cmap3.phi2[ed])];
+// //     let v3 = cmap3.cut_edge(ed, true);
+// //     pos3[cmap3.cell(cmap3.vertex, v3)] = (new THREE.Vector3()).add(p1).add(p2).multiplyScalar(0.5);
     
-// }, cache_ed);
+// // }, cache_ed);
 
-// cmap3.cut_face(cmap3.phi1[0], cmap3.phi_1[0], true)
-// let c3d0 = cmap3.phi2[0];
-// let c3d1 = cmap3.phi1[cmap3.phi1[c3d0]];
-// console.log(c3d0, c3d1)
-// cmap3.cut_face(c3d0, c3d1, true)
-// c3d0 = cmap3.phi1[cmap3.phi2[c3d1]];
-// c3d1 = cmap3.phi1[cmap3.phi1[c3d0]];
-// cmap3.cut_face(c3d0, c3d1, true)
-// let c3ed = cmap3.phi1[0];
-// let path_d = [c3ed];
-// path_d.push(cmap3.phi1[cmap3.phi2[cmap3.phi1[c3ed]]]);
-// path_d.push(cmap3.phi_1[cmap3.phi2[cmap3.phi_1[c3ed]]]);
-// cmap3.cut_volume(path_d, true);
+// // cmap3.cut_face(cmap3.phi1[0], cmap3.phi_1[0], true)
+// // let c3d0 = cmap3.phi2[0];
+// // let c3d1 = cmap3.phi1[cmap3.phi1[c3d0]];
+// // console.log(c3d0, c3d1)
+// // cmap3.cut_face(c3d0, c3d1, true)
+// // c3d0 = cmap3.phi1[cmap3.phi2[c3d1]];
+// // c3d1 = cmap3.phi1[cmap3.phi1[c3d0]];
+// // cmap3.cut_face(c3d0, c3d1, true)
+// // let c3ed = cmap3.phi1[0];
+// // let path_d = [c3ed];
+// // path_d.push(cmap3.phi1[cmap3.phi2[cmap3.phi1[c3ed]]]);
+// // path_d.push(cmap3.phi_1[cmap3.phi2[cmap3.phi_1[c3ed]]]);
+// // cmap3.cut_volume(path_d, true);
 
 // let renderer3 = new Renderer(cmap3);
 // renderer3.volumes.create().add(scene).rescale(0.85);
@@ -148,9 +148,37 @@ clock.start();
 
 let cmap3 = load_cmap3("mesh", metatron);
 let load_time = clock.getDelta();
+console.log("load time: ", load_time);
+
+let integrity = true;
+cmap3.foreach_dart(d => {
+	integrity &= cmap3.phi_1[cmap3.phi1[d]] == d;
+	integrity &= cmap3.phi1[cmap3.phi_1[d]] == d;
+	integrity &= cmap3.phi2[d] != d;
+	integrity &= cmap3.phi2[cmap3.phi2[d]] == d;
+	integrity &= cmap3.phi3[d] != d;
+	integrity &= cmap3.phi3[cmap3.phi3[d]] == d;
+});
+
+console.log("integrity", integrity);
+
+// cmap3.foreach_incident(cmap3.vertex2, cmap3.volume, 0, v2d => {
+// 	cmap3.foreach_dart_of(cmap3.vertex2, v2d, d => {console.log("v2d", cmap3.cell(5, d))});
+// });
+
+// cmap3.foreach_incident(cmap3.vertex2, cmap3.volume, cmap3.phi3[0], v2d => {
+// 	cmap3.foreach_dart_of(cmap3.vertex2, v2d, d => {console.log("3 v2d", cmap3.cell(5, d))});
+// });
+
+// cmap3.foreach(5, vd => {
+// 	cmap3.foreach_dart_of(5, vd, d => {console.log(cmap3.cell(5, d))});
+// })
 
 let renderer3 = new Renderer(cmap3);
 renderer3.volumes.create().add(scene);
+// renderer3.faces.create().add(scene);
+// renderer3.edges.create().add(scene);
+// renderer3.vertices.create({size: 0.05}).add(scene);
 let renderer_time = clock.getDelta();
 
 let total_time = load_time + renderer_time;
@@ -250,6 +278,7 @@ let average_time_1 = 0;
 // average_time_1 /= iterations;
 // console.log("foreach_incident vertex to connex times : ", average_time_0, average_time_1);
 
+    // renderer3.volumes.rescale(0.85)
 
 function update ()
 {
