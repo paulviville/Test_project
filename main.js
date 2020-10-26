@@ -7,8 +7,8 @@ import * as THREE from './CMapJS/three.module.js';
 import {OrbitControls} from './CMapJS/OrbitsControls.js';
 import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
 import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
-import {tetrahedron_off, cactus_off, fertility_off} from './off_files.js';
-import {test1_mesh, fertility, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
+import {tetrahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
+import {test1_mesh, fertility, dinopet, santa, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
 
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
@@ -88,7 +88,7 @@ scene.add(pointLight0);
 // let renderer0 = new Renderer(cmap0);
 // renderer0.vertices.create({size: 0.025}).add(scene);
 
-let cmap2 = load_cmap2('off', tetrahedron_off);
+let cmap2 = load_cmap2('off', metatron_off);
 // cmap2.set_embeddings(cmap2.edge);
 // cmap2.set_embeddings(cmap2.face);
 let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
@@ -101,9 +101,11 @@ pos2[cmap2.cell(cmap2.vertex, v2)] = (new THREE.Vector3()).add(p2_1).add(p2_2).m
 let renderer2 = new Renderer(cmap2);
 // renderer2.vertices.create({size: 0.025}).add(scene);
 // renderer2.edges.create({size: 0.025}).add(scene);
-// renderer2.faces.create({size: 0.025}).add(scene);
+renderer2.faces.create({size: 0.025}).add(scene);
 
-
+// function test({cache = undefined, indices = false}){
+//     console.log(cache, indices);
+// }
 
 
 
@@ -302,7 +304,6 @@ function loop()
 {
     update();
     render();
-
     requestAnimationFrame(loop);
 }
 
