@@ -150,6 +150,8 @@ clock.start();
 
 let cmap3 = load_cmap3("mesh", metatron);
 let load_time = clock.getDelta();
+cmap3.set_embeddings(cmap3.edge);
+let load_time2 = clock.getDelta();
 console.log("load time: ", load_time);
 
 let integrity = true;
@@ -178,9 +180,9 @@ console.log("integrity", integrity);
 
 let renderer3 = new Renderer(cmap3);
 renderer3.volumes.create().add(scene);
-// renderer3.faces.create().add(scene);
-// renderer3.edges.create().add(scene);
-// renderer3.vertices.create({size: 0.05}).add(scene);
+renderer3.faces.create().add(scene);
+renderer3.edges.create().add(scene);
+renderer3.vertices.create({size: 0.05}).add(scene);
 let renderer_time = clock.getDelta();
 
 let total_time = load_time + renderer_time;
