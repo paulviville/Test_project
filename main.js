@@ -94,11 +94,13 @@ let cmap2 = load_cmap2('off', cube_off);
 // cmap2.set_embeddings(cmap2.face);
 let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
 
-catmull_clark(cmap2);
-catmull_clark(cmap2);
-catmull_clark(cmap2);
-catmull_clark(cmap2);
-catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
 
 // let p2_1 = pos2[cmap2.cell(cmap2.vertex, 0)];
 // let p2_2 = pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[0])];
@@ -108,12 +110,12 @@ catmull_clark(cmap2);
 
 let cmap2_base = load_cmap2('off', cube_off);
 let renderer2_base = new Renderer(cmap2_base);
-renderer2_base.edges.create({size: 0.025}).add(scene);
+// renderer2_base.edges.create({size: 0.025}).add(scene);
 
 let renderer2 = new Renderer(cmap2);
 // renderer2.vertices.create({size: 0.025}).add(scene);
-renderer2.edges.create({size: 0.025}).add(scene);
-renderer2.faces.create({size: 0.025}).add(scene);
+// renderer2.edges.create({size: 0.025}).add(scene);
+// renderer2.faces.create({size: 0.025}).add(scene);
 
 // function test({cache = undefined, indices = false}){
 //     console.log(cache, indices);
@@ -160,7 +162,7 @@ renderer2.faces.create({size: 0.025}).add(scene);
 let clock = new THREE.Clock();
 clock.start();
 
-let cmap3 = load_cmap3("mesh", test0_mesh);
+let cmap3 = load_cmap3("mesh", metatron);
 let load_time = clock.getDelta();
 cmap3.set_embeddings(cmap3.edge);
 let load_time2 = clock.getDelta();
@@ -191,7 +193,7 @@ console.log("integrity", integrity);
 // })
 
 let renderer3 = new Renderer(cmap3);
-// renderer3.volumes.create().add(scene);
+renderer3.volumes.create().add(scene);
 // renderer3.faces.create().add(scene);
 // renderer3.edges.create().add(scene);
 // renderer3.vertices.create({size: 0.05}).add(scene);
@@ -298,15 +300,15 @@ let average_time_1 = 0;
 
 function update ()
 {
-    // renderer3.volumes.mesh.rotation.x += 0.003125
-    // renderer3.volumes.mesh.rotation.y -= 0.001875
-    // renderer3.volumes.mesh.rotation.z += 0.000625
-    // let s = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer3.volumes.mesh.rotation.y * 30) / 10;
-    // renderer3.volumes.rescale(0.8 + s)
-    // let s2 = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 2) / 10;
-    // renderer3.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
+    renderer3.volumes.mesh.rotation.x += 0.003125
+    renderer3.volumes.mesh.rotation.y -= 0.001875
+    renderer3.volumes.mesh.rotation.z += 0.000625
+    let s = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer3.volumes.mesh.rotation.y * 30) / 10;
+    renderer3.volumes.rescale(0.8 + s)
+    let s2 = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 2) / 10;
+    renderer3.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
 
-    // pointLight0.color.b = 0.8 + s ;
+    pointLight0.color.b = 0.8 + s ;
 }
 
 function render()
