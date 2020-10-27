@@ -12,7 +12,7 @@ export let tetrahedron_off =
 3 3 2 1 \n\
 ";
 
-let icosahedron_off =
+export let icosahedron_off =
 "OFF\n\
 \n\
 12 20 0\n\
@@ -50,7 +50,7 @@ let icosahedron_off =
 3 10 11 6\n\
 ";
 
-let octahedron_off = 
+export let octahedron_off = 
 "OFF\n\
 \n\
 6 8 0\n\
@@ -70,7 +70,7 @@ let octahedron_off =
 3 1 2 5\n\
 ";
 
-let dodecahedron_off = 
+export let dodecahedron_off = 
 `OFF
 
 20 12 0
@@ -108,18 +108,18 @@ let dodecahedron_off =
 5 19 18 17 16 15
 `;
 
-let cube_off = `
+export let cube_off = `
 OFF
 
 8 6 0
--1 -1 -1
-1 -1 -1
-1 -1 1
--1 -1 1
--1 1 -1
-1 1 -1
-1 1 1
--1 1 1
+-0.5 -0.5 -0.5
+0.5 -0.5 -0.5
+0.5 -0.5 0.5
+-0.5 -0.5 0.5
+-0.5 0.5 -0.5
+0.5 0.5 -0.5
+0.5 0.5 0.5
+-0.5 0.5 0.5
 4 0 1 2 3
 4 3 2 6 7
 4 2 1 5 6
