@@ -9,9 +9,11 @@ import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js'
 import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
 import {tetrahedron_off, icosahedron_off, cube_off, octahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
 import {test1_mesh, fertility, dinopet, santa, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
-import {cut_all_edges, quadrangulate_all_faces} from './CMapJS/Utils/Subdivision.js';
+import {cut_all_edges, quadrangulate_all_faces, triangulate_all_faces, triangulate_face} from './CMapJS/Utils/Subdivision.js';
 import {catmull_clark} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
+import { sqrt3 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt3.js';
+import { sqrt2 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt2.js';
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
 // let d0 = cmap0.new_dart();
@@ -90,22 +92,43 @@ scene.add(pointLight0);
 // let renderer0 = new Renderer(cmap0);
 // renderer0.vertices.create({size: 0.025}).add(scene);
 
-let cmap2 = load_cmap2('off', icosahedron_off);
+let cmap2 = load_cmap2('off', cube_off);
 // cmap2.set_embeddings(cmap2.edge);
 // cmap2.set_embeddings(cmap2.face);
 let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
+// let vd0 = triangulate_face(cmap2, 0);
+// console.log(vd0, cmap2.cell(cmap2.vertex, vd0))
+// pos2[cmap2.cell(cmap2.vertex, vd0)] = new THREE.Vector3;
 
+// let degree = 0;
+// let vid = cmap2.cell(cmap2.vertex, vd0);
+// pos2[vid] = new THREE.Vector3;
+// cmap2.foreach_dart_of(cmap2.vertex, vd0, d => {
+// 	++degree;
+// 	pos2[vid].add(pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[d])]);
+// });
+// pos2[vid].multiplyScalar(1 / degree);
+// console.log(degree)
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
-doo_sabin(cmap2);
+// doo_sabin(cmap2);
+// catmull_clark(cmap2);
+
+// doo_sabin(cmap2);
+// doo_sabin(cmap2);
+
+sqrt2(cmap2);
+sqrt2(cmap2);
+sqrt2(cmap2);
+sqrt2(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
 catmull_clark(cmap2);
 
-// doo_sabin(cmap2);
-// doo_sabin(cmap2);
 
 // let p2_1 = pos2[cmap2.cell(cmap2.vertex, 0)];
 // let p2_2 = pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[0])];
@@ -113,12 +136,12 @@ catmull_clark(cmap2);
 // pos2[cmap2.cell(cmap2.vertex, v2)] = (new THREE.Vector3()).add(p2_1).add(p2_2).multiplyScalar(0.5);
 
 
-let cmap2_base = load_cmap2('off', icosahedron_off);
+let cmap2_base = load_cmap2('off', cube_off);
 let renderer2_base = new Renderer(cmap2_base);
 renderer2_base.edges.create({size: 0.025}).add(scene);
 
 let renderer2 = new Renderer(cmap2);
-renderer2.vertices.create({size: 0.025}).add(scene);
+// renderer2.vertices.create({size: 0.025}).add(scene);
 renderer2.edges.create({size: 0.025}).add(scene);
 renderer2.faces.create({size: 0.025}).add(scene);
 
