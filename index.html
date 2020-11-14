@@ -5,7 +5,7 @@
 		<title>Test_project</title>
 	 <style>
 			body { margin : 0; max-width: 100%; max-height: 100%; margin: 0;}
-			canvas {width: 100%; height: 100%; max-width: 100%; max-height: 100%; margin: 0; display: block;}
+			canvas {width: 100%; height: 100%; max-width: 100%; max-height: 100%; margin: 0;}
 		</style>
 		<link rel="stylesheet" href="/reveal.js-master/dist/reveal.css">
 		<link rel="stylesheet" href="/reveal.js-master/dist/theme/black.css">
@@ -17,89 +17,13 @@
 			<div class="slides">
 				<section>Catmull Clark</section>
 				<section>
-					<canvas id="mycanvas"></canvas>
+					<div id="mycanvasdiv">
+
+					</div>
+					<!-- <canvas id="mycanvas"></canvas> -->
 					<!-- <script src="main.js" type="module"></script> -->
 					<script type="module">
-						import {CMap0} from './CMapJS/CMap/CMap.js';
-						import Renderer from './CMapJS/Renderer.js';
-						import * as THREE from './CMapJS/three.module.js';
-						import {OrbitControls} from './CMapJS/OrbitsControls.js';
 
-						let cmap0 = new CMap0();
-						const dart = CMap0.dart;
-						let d0 = cmap0.new_dart();
-						let d1 = cmap0.new_dart();
-						let d2 = cmap0.new_dart();
-
-						// cmap0.create_embedding(cmap0.vertex);
-						cmap0.set_embeddings(cmap0.vertex);
-
-						let position = cmap0.add_attribute(cmap0.vertex, "position");
-						position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
-						position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
-						position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
-
-						const scene = new THREE.Scene();
-						scene.background = new THREE.Color(0x222222);
-						const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000.0);
-						camera.position.set(0, 0, 2);
-						let canvas = document.getElementById("mycanvas");
-						const renderer = new THREE.WebGLRenderer({canvas: canvas});
-						console.log(canvas)
-						renderer.setSize( window.innerWidth, window.innerHeight );
-						document.body.appendChild( renderer.domElement );
-
-						window.addEventListener('resize', function() {
-							const width = window.innerWidth;
-							const height = window.innerHeight;
-							renderer.setSize(width, height);
-							camera.aspect = width / height;
-							camera.updateProjectionMatrix();
-						});
-
-						let orbit_controls = new OrbitControls(camera, renderer.domElement)
-						orbit_controls.enablePan = false;
-						orbit_controls.update();
-						// orbit_controls.addEventListener('change', render);
-
-						let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
-						scene.add(ambientLight);
-						let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
-						pointLight0.position.set(10,8,5);
-						// let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
-						// pointLight0.position.set(0, 0, 0);
-						// pointLight1.position.set(-10,-8,-5);
-						scene.add(pointLight0);
-						// scene.add(pointLight1);
-
-						let renderer0 = new Renderer(cmap0);
-						renderer0.vertices.create({size: 0.25}).add(scene);
-						function update ()
-{
-    // renderer3.volumes.mesh.rotation.x += 0.003125
-    // renderer3.volumes.mesh.rotation.y -= 0.001875
-    // renderer3.volumes.mesh.rotation.z += 0.000625
-    // let s = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 4) / 5 + Math.cos(renderer3.volumes.mesh.rotation.y * 30) / 10;
-    // renderer3.volumes.rescale(0.8 + s)
-    // let s2 = Math.sin(renderer3.volumes.mesh.rotation.x / Math.PI * 2) / 10;
-    // renderer3.volumes.mesh.scale.set(1 + s2, 1 + s2, 1 + s2);
-
-    // pointLight0.color.b = 0.8 + s ;
-}
-
-						function render()
-						{
-						renderer.render(scene, camera);
-						}
-
-						function mainloop()
-						{
-						update();
-						render();
-						requestAnimationFrame(mainloop);
-						}
-
-						mainloop();
 					</script>
 				</section>
 			</div>
@@ -107,7 +31,81 @@
 
 		<script type="module">
 			import Reveal from './reveal.js-master/dist/reveal.esm.js'
-			Reveal.initialize();
+			import {CMap0} from './CMapJS/CMap/CMap.js';
+			import Renderer from './CMapJS/Renderer.js';
+			import * as THREE from './CMapJS/three.module.js';
+			import {OrbitControls} from './CMapJS/OrbitsControls.js';
+			Reveal.initialize().then(() => {
+				let canvas = document.getElementById("mycanvas");
+				let div = document.getElementById("mycanvasdiv")
+
+				let cmap0 = new CMap0();
+				const dart = CMap0.dart;
+				let d0 = cmap0.new_dart();
+				let d1 = cmap0.new_dart();
+				let d2 = cmap0.new_dart();
+
+				// cmap0.create_embedding(cmap0.vertex);
+				cmap0.set_embeddings(cmap0.vertex);
+
+				let position = cmap0.add_attribute(cmap0.vertex, "position");
+				position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
+				position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
+				position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
+
+				const scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x222222);
+				const camera = new THREE.PerspectiveCamera(75, div.parentElement.parentElement.clientWidth / div.parentElement.parentElement.clientHeight, 0.1, 1000.0);
+				camera.position.set(0, 0, 2);
+				
+				const renderer = new THREE.WebGLRenderer();
+				renderer.setSize( div.parentElement.parentElement.clientWidth, div.parentElement.parentElement.clientHeight );
+				div.appendChild( renderer.domElement );
+
+				window.addEventListener('resize', function() {
+					const width = window.innerWidth;
+					const height = window.innerHeight;
+					renderer.setSize(width, height);
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+				});
+
+				let orbit_controls = new OrbitControls(camera, renderer.domElement)
+				orbit_controls.enablePan = false;
+				orbit_controls.update();
+				// orbit_controls.addEventListener('change', render);
+
+				let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
+				scene.add(ambientLight);
+				let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+				pointLight0.position.set(10,8,5);
+				// let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
+				// pointLight0.position.set(0, 0, 0);
+				// pointLight1.position.set(-10,-8,-5);
+				scene.add(pointLight0);
+				// scene.add(pointLight1);
+
+				let renderer0 = new Renderer(cmap0);
+				renderer0.vertices.create({size: 0.25}).add(scene);
+				function update ()
+				{
+
+				}
+
+				function render()
+				{
+				renderer.render(scene, camera);
+				}
+
+				function mainloop()
+				{
+				update();
+				render();
+				requestAnimationFrame(mainloop);
+				}
+
+				mainloop();
+			});
 		</script>
 	</body>
 
