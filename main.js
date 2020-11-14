@@ -10,11 +10,13 @@ import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js'
 import {tetrahedron_off, icosahedron_off, cube_off, octahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
 import {test1_mesh, fertility, dinopet, santa, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
 import {cut_all_edges, quadrangulate_all_faces, triangulate_all_faces, triangulate_face} from './CMapJS/Utils/Subdivision.js';
-import {catmull_clark} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
+import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 import { sqrt3 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt3.js';
 import { sqrt2 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt2.js';
 import { loop } from './CMapJS/Modeling/Subdivision/Surface/Loop.js';
+import { butterfly } from './CMapJS/Modeling/Subdivision/Surface/Butterfly.js';
+
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
 // let d0 = cmap0.new_dart();
@@ -117,13 +119,21 @@ let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // doo_sabin(cmap2);
-// catmull_clark(cmap2);
+catmull_clark_inter(cmap2);
+catmull_clark_inter(cmap2);
+// catmull_clark_inter(cmap2);
+// catmull_clark_inter(cmap2);
 
 // doo_sabin(cmap2);
 // doo_sabin(cmap2);
 
-loop(cmap2);
-loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
 // loop(cmap2);
 
 // sqrt3(cmap2);
@@ -138,7 +148,6 @@ loop(cmap2);
 // sqrt3(cmap2);
 // sqrt3(cmap2);
 // catmull_clark(cmap2);
-
 
 // let p2_1 = pos2[cmap2.cell(cmap2.vertex, 0)];
 // let p2_2 = pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[0])];
