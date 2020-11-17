@@ -15,17 +15,11 @@
 		
 		<div class="reveal">
 			<div class="slides">
-				<section>Catmull Clark</section>
-				<section>
-					<div id="mycanvasdiv">
-
-					</div>
-					<!-- <canvas id="mycanvas"></canvas> -->
-					<!-- <script src="main.js" type="module"></script> -->
-					<script type="module">
-
-					</script>
-				</section>
+				<section id="CatmullClark">Catmull Clark</section>
+				<section id="Doo-Sabin">Doo-Sabin</section>
+				<section id="Sqrt 3">Sqrt 3</section>
+				<section id="Sqrt 2">Sqrt 2</section>
+				<section id="Loop">Loop</section>
 			</div>
 		</div>
 
@@ -35,77 +29,107 @@
 			import Renderer from './CMapJS/Renderer.js';
 			import * as THREE from './CMapJS/three.module.js';
 			import {OrbitControls} from './CMapJS/OrbitsControls.js';
-			Reveal.initialize().then(() => {
-				let canvas = document.getElementById("mycanvas");
-				let div = document.getElementById("mycanvasdiv")
+			import {Slide} from './Slide.js';
+			import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
+			import {tetrahedron_off, icosahedron_off, cube_off, octahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
 
-				let cmap0 = new CMap0();
-				const dart = CMap0.dart;
-				let d0 = cmap0.new_dart();
-				let d1 = cmap0.new_dart();
-				let d2 = cmap0.new_dart();
+			import {cc_slide, ds_slide, sqrt2_slide, sqrt3_slide, loop_slide} from './slides.js';
 
-				// cmap0.create_embedding(cmap0.vertex);
-				cmap0.set_embeddings(cmap0.vertex);
+			let slides = new Array();
+			slides["CatmullClark"] = cc_slide;
+			slides["Doo-Sabin"] = ds_slide;
+			slides["Sqrt 3"] = sqrt3_slide;
+			slides["Sqrt 2"] = sqrt2_slide;
+			slides["Loop"] = loop_slide;
 
-				let position = cmap0.add_attribute(cmap0.vertex, "position");
-				position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
-				position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
-				position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
-
-				const scene = new THREE.Scene();
-				scene.background = new THREE.Color(0x222222);
-				const camera = new THREE.PerspectiveCamera(75, div.parentElement.parentElement.clientWidth / div.parentElement.parentElement.clientHeight, 0.1, 1000.0);
-				camera.position.set(0, 0, 2);
-				
-				const renderer = new THREE.WebGLRenderer();
-				renderer.setSize( div.parentElement.parentElement.clientWidth, div.parentElement.parentElement.clientHeight );
-				div.appendChild( renderer.domElement );
-
-				window.addEventListener('resize', function() {
-					const width = window.innerWidth;
-					const height = window.innerHeight;
-					renderer.setSize(width, height);
-					camera.aspect = width / height;
-					camera.updateProjectionMatrix();
-				});
-
-				let orbit_controls = new OrbitControls(camera, renderer.domElement)
-				orbit_controls.enablePan = false;
-				orbit_controls.update();
-				// orbit_controls.addEventListener('change', render);
-
-				let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
-				scene.add(ambientLight);
-				let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
-				pointLight0.position.set(10,8,5);
-				// let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
-				// pointLight0.position.set(0, 0, 0);
-				// pointLight1.position.set(-10,-8,-5);
-				scene.add(pointLight0);
-				// scene.add(pointLight1);
-
-				let renderer0 = new Renderer(cmap0);
-				renderer0.vertices.create({size: 0.25}).add(scene);
-				function update ()
-				{
-
-				}
-
-				function render()
-				{
-				renderer.render(scene, camera);
-				}
-
-				function mainloop()
-				{
-				update();
-				render();
-				requestAnimationFrame(mainloop);
-				}
-
-				mainloop();
+			let active_slide;
+			Reveal.addEventListener('slidechanged', function(event) {
+				if(active_slide) active_slide.close();
+				var sectionID = Reveal.getCurrentSlide().id;
+				active_slide = slides[sectionID]
+				if(active_slide) active_slide.open();
 			});
+
+			Reveal.initialize().then(() => {
+				slides["CatmullClark"].init(document.getElementById("CatmullClark"));
+				slides["Doo-Sabin"].init(document.getElementById("Doo-Sabin"));
+				slides["Sqrt 3"].init(document.getElementById("Sqrt 3"));
+				slides["Sqrt 2"].init(document.getElementById("Sqrt 2"));
+				slides["Loop"].init(document.getElementById("Loop"));
+				slides["CatmullClark"].open();
+				// let canvas = document.getElementById("mycanvas");
+				// let div = document.getElementById("mycanvasdiv")
+
+				// let cmap0 = new CMap0();
+				// const dart = CMap0.dart;
+				// let d0 = cmap0.new_dart();
+				// let d1 = cmap0.new_dart();
+				// let d2 = cmap0.new_dart();
+
+				// // cmap0.create_embedding(cmap0.vertex);
+				// cmap0.set_embeddings(cmap0.vertex);
+
+				// let position = cmap0.add_attribute(cmap0.vertex, "position");
+				// position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
+				// position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
+				// position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
+
+				// const scene = new THREE.Scene();
+				// scene.background = new THREE.Color(0x191919);
+				// const camera = new THREE.PerspectiveCamera(75, div.parentElement.parentElement.clientWidth / div.parentElement.parentElement.clientHeight, 0.1, 1000.0);
+				// camera.position.set(0, 0, 2);
+				
+				// const renderer = new THREE.WebGLRenderer();
+				// renderer.setSize( div.parentElement.parentElement.clientWidth, div.parentElement.parentElement.clientHeight );
+				// div.appendChild( renderer.domElement );
+
+				// // renderer.domElement.addEventListener('resize', function() {
+				// // 	const width = window.innerWidth;
+				// // 	const height = window.innerHeight;
+				// // 	renderer.setSize(width, height);
+				// // 	camera.aspect = width / height;
+				// // 	camera.updateProjectionMatrix();
+				// // 	console.log("geree ")
+				// // });
+
+				// let orbit_controls = new OrbitControls(camera, renderer.domElement)
+				// orbit_controls.enablePan = false;
+				// orbit_controls.update();
+				// // orbit_controls.addEventListener('change', render);
+
+				// let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
+				// scene.add(ambientLight);
+				// let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+				// pointLight0.position.set(10,8,5);
+				// // let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
+				// // pointLight0.position.set(0, 0, 0);
+				// // pointLight1.position.set(-10,-8,-5);
+				// scene.add(pointLight0);
+				// // scene.add(pointLight1);
+
+				// let renderer0 = new Renderer(cmap0);
+				// renderer0.vertices.create({size: 0.25}).add(scene);
+				// function update ()
+				// {
+
+				// }
+
+				// function render()
+				// {
+				// renderer.render(scene, camera);
+				// }
+
+				// function mainloop()
+				// {
+				// 	// console.log("test")
+				// update();
+				// render();
+				// requestAnimationFrame(mainloop);
+				// }
+
+				// mainloop();
+			});
+			
 		</script>
 	</body>
 

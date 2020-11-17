@@ -77,6 +77,7 @@ window.addEventListener('resize', function() {
     camera.updateProjectionMatrix();
 });
 
+
 let orbit_controls = new OrbitControls(camera, renderer.domElement)
 orbit_controls.enablePan = false;
 orbit_controls.update();
