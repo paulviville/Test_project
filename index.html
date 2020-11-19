@@ -52,7 +52,7 @@
 				if(active_slide) active_slide.open();
 			});
 
-			Reveal.initialize().then(() => {
+			Reveal.initialize({touch: false}).then(() => {
 				let slide_domE = document.getElementById("slides");
 				let w = slide_domE.clientWidth;
 				let h = slide_domE.clientHeight;
