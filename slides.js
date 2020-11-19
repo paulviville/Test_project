@@ -19,8 +19,8 @@ export let cc_slide = new Slide(
 
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color(0x191919);
-		this.scene.add(new THREE.AmbientLight(0xAAAAFF, 0.8));
-		let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+		this.scene.add(new THREE.AmbientLight(0xFFFFFF, 0.8));
+		let pointLight0 = new THREE.PointLight(0xFFFFFF, 0.8);
 		pointLight0.position.set(10,8,5);
 		this.scene.add(pointLight0);
 		
@@ -39,6 +39,7 @@ export let cc_slide = new Slide(
 		this.cmap2 = load_cmap2('off', cube_off);
 		this.map_renderer = new Renderer(this.cmap2);
 		this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+		this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 
 		this.running = false;
 		const axis = new THREE.Vector3(1, 1, 0.5).normalize();
@@ -50,18 +51,22 @@ export let cc_slide = new Slide(
 					next_step += 3;
 					catmull_clark(this.cmap2);
 					this.map_renderer.edges.update();
+					this.map_renderer.faces.update();
 				}
 				if(this.time > 15){
 					this.time = 0;
 					this.map_renderer.edges.delete();
+					this.map_renderer.faces.delete();
 					next_step = 3;					
 					this.cmap2 = load_cmap2('off', cube_off);
 					this.map_renderer = new Renderer(this.cmap2);
 					this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+					this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 					this.clock.start();
 
 				}
 				this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				this.map_renderer.faces.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 				
 				this.renderer.render(this.scene, this.camera);
 				requestAnimationFrame(this.loop.bind(this));
@@ -90,8 +95,8 @@ export let ds_slide = new Slide(
 
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color(0x191919);
-		this.scene.add(new THREE.AmbientLight(0xAAAAFF, 0.8));
-		let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+		this.scene.add(new THREE.AmbientLight(0xFFFFFF, 0.8));
+		let pointLight0 = new THREE.PointLight(0xFFFFFF, 0.8);
 		pointLight0.position.set(10,8,5);
 		this.scene.add(pointLight0);
 		
@@ -110,6 +115,7 @@ export let ds_slide = new Slide(
 		this.cmap2 = load_cmap2('off', cube_off);
 		this.map_renderer = new Renderer(this.cmap2);
 		this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+		this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 
 		this.running = false;
 		const axis = new THREE.Vector3(1, 1, 0.5).normalize();
@@ -121,18 +127,22 @@ export let ds_slide = new Slide(
 					next_step += 3;
 					doo_sabin(this.cmap2);
 					this.map_renderer.edges.update();
+					this.map_renderer.faces.update();
 				}
 				if(this.time > 15){
 					this.map_renderer.edges.delete();
+					this.map_renderer.faces.delete();
 					this.time = 0;
 					next_step = 3;					
 					this.cmap2 = load_cmap2('off', cube_off);
 					this.map_renderer = new Renderer(this.cmap2);
 					this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+					this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 					this.clock.start();
 
 				}
 				this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				this.map_renderer.faces.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 				
 				this.renderer.render(this.scene, this.camera);
 				requestAnimationFrame(this.loop.bind(this));
@@ -160,8 +170,8 @@ export let sqrt2_slide = new Slide(
 
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color(0x191919);
-		this.scene.add(new THREE.AmbientLight(0xAAAAFF, 0.8));
-		let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+		this.scene.add(new THREE.AmbientLight(0xFFFFFF, 0.8));
+		let pointLight0 = new THREE.PointLight(0xFFFFFF, 0.8);
 		pointLight0.position.set(10,8,5);
 		this.scene.add(pointLight0);
 		
@@ -180,6 +190,7 @@ export let sqrt2_slide = new Slide(
 		this.cmap2 = load_cmap2('off', cube_off);
 		this.map_renderer = new Renderer(this.cmap2);
 		this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+		this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 
 		this.running = false;
 		const axis = new THREE.Vector3(1, 1, 0.5).normalize();
@@ -191,18 +202,22 @@ export let sqrt2_slide = new Slide(
 					next_step += 3;
 					sqrt2(this.cmap2);
 					this.map_renderer.edges.update();
+					this.map_renderer.faces.update();
 				}
 				if(this.time > 15){
 					this.map_renderer.edges.delete();
+					this.map_renderer.faces.delete();
 					this.time = 0;
 					next_step = 3;					
 					this.cmap2 = load_cmap2('off', cube_off);
 					this.map_renderer = new Renderer(this.cmap2);
 					this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+					this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 					this.clock.start();
 
 				}
 				this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				this.map_renderer.faces.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 				
 				this.renderer.render(this.scene, this.camera);
 				requestAnimationFrame(this.loop.bind(this));
@@ -229,8 +244,8 @@ export let sqrt3_slide = new Slide(
 
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color(0x191919);
-		this.scene.add(new THREE.AmbientLight(0xAAAAFF, 0.8));
-		let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+		this.scene.add(new THREE.AmbientLight(0xFFFFFF, 0.8));
+		let pointLight0 = new THREE.PointLight(0xFFFFFF, 0.8);
 		pointLight0.position.set(10,8,5);
 		this.scene.add(pointLight0);
 		
@@ -249,6 +264,7 @@ export let sqrt3_slide = new Slide(
 		this.cmap2 = load_cmap2('off', octahedron_off);
 		this.map_renderer = new Renderer(this.cmap2);
 		this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+		this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 
 		this.running = false;
 		const axis = new THREE.Vector3(1, 1, 0.5).normalize();
@@ -260,18 +276,22 @@ export let sqrt3_slide = new Slide(
 					next_step += 3;
 					sqrt3(this.cmap2);
 					this.map_renderer.edges.update();
+					this.map_renderer.faces.update();
 				}
 				if(this.time > 15){
 					this.map_renderer.edges.delete();
+					this.map_renderer.faces.delete();
 					this.time = 0;
 					next_step = 3;					
 					this.cmap2 = load_cmap2('off', octahedron_off);
 					this.map_renderer = new Renderer(this.cmap2);
 					this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+					this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 					this.clock.start();
 
 				}
 				this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				this.map_renderer.faces.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 				
 				this.renderer.render(this.scene, this.camera);
 				requestAnimationFrame(this.loop.bind(this));
@@ -298,8 +318,8 @@ export let loop_slide = new Slide(
 
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color(0x191919);
-		this.scene.add(new THREE.AmbientLight(0xAAAAFF, 0.8));
-		let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+		this.scene.add(new THREE.AmbientLight(0xFFFFFF, 0.8));
+		let pointLight0 = new THREE.PointLight(0xFFFFFF, 0.8);
 		pointLight0.position.set(10,8,5);
 		this.scene.add(pointLight0);
 		
@@ -318,6 +338,7 @@ export let loop_slide = new Slide(
 		this.cmap2 = load_cmap2('off', octahedron_off);
 		this.map_renderer = new Renderer(this.cmap2);
 		this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+		this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 
 		this.running = false;
 		const axis = new THREE.Vector3(1, 1, 0.5).normalize();
@@ -329,18 +350,22 @@ export let loop_slide = new Slide(
 					next_step += 3;
 					loop(this.cmap2);
 					this.map_renderer.edges.update();
+					this.map_renderer.faces.update();
 				}
 				if(this.time > 15){
 					this.map_renderer.edges.delete();
+					this.map_renderer.faces.delete();
 					this.time = 0;
 					next_step = 3;					
 					this.cmap2 = load_cmap2('off', octahedron_off);
 					this.map_renderer = new Renderer(this.cmap2);
 					this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+					this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 					this.clock.start();
 
 				}
 				this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				this.map_renderer.faces.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 
 				this.renderer.render(this.scene, this.camera);
 				requestAnimationFrame(this.loop.bind(this));
@@ -366,8 +391,8 @@ export let butterfly_slide = new Slide(
 		this.time = 0;
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color(0x191919);
-		this.scene.add(new THREE.AmbientLight(0xAAAAFF, 0.8));
-		let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+		this.scene.add(new THREE.AmbientLight(0xFFFFFF, 0.8));
+		let pointLight0 = new THREE.PointLight(0xFFFFFF, 0.8);
 		pointLight0.position.set(10,8,5);
 		this.scene.add(pointLight0);
 		
@@ -386,6 +411,7 @@ export let butterfly_slide = new Slide(
 		this.cmap2 = load_cmap2('off', octahedron_off);
 		this.map_renderer = new Renderer(this.cmap2);
 		this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+		this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 
 		this.running = false;
 		const axis = new THREE.Vector3(1, 1, 0.5).normalize();
@@ -397,18 +423,22 @@ export let butterfly_slide = new Slide(
 					next_step += 3;
 					butterfly(this.cmap2);
 					this.map_renderer.edges.update();
+					this.map_renderer.faces.update();
 				}
 				if(this.time > 15){
 					this.map_renderer.edges.delete();
+					this.map_renderer.faces.delete();
 					this.time = 0;
 					next_step = 3;					
 					this.cmap2 = load_cmap2('off', octahedron_off);
 					this.map_renderer = new Renderer(this.cmap2);
 					this.map_renderer.edges.create({color: 0xFFFFFF}).add(this.scene);
+					this.map_renderer.faces.create({color: 0xFFFFFF, transparent: true, opacity: 0.5}).add(this.scene);
 					this.clock.start();
 					
 				}
 				this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				this.map_renderer.faces.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 
 				this.renderer.render(this.scene, this.camera);
 				requestAnimationFrame(this.loop.bind(this));
