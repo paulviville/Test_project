@@ -4,7 +4,7 @@
 	<head>
 		<title>Test_project</title>
 	 <style>
-			body { margin : 0; max-width: 100%; max-height: 100%; margin: 0;}
+			/* body { margin : 0; max-width: 100%; max-height: 100%; margin: 0;} */
 			/* canvas {width: 100%; height: 100%; max-width: 100%; max-height: 100%; margin: 0;} */
 		</style>
 		<link rel="stylesheet" href="./reveal.js-master/dist/reveal.css">
@@ -20,6 +20,7 @@
 				<section id="Sqrt 3">Sqrt 3 <div id="Sqrt 3_div"></div></section>
 				<section id="Sqrt 2">Sqrt 2 <div id="Sqrt 2_div"></div></section>
 				<section id="Loop">Loop <div id="Loop_div"></div></section>
+				<section id="Butterfly">Butterfly <div id="Butterfly_div"></div></section>
 			</div>
 		</div>
 
@@ -33,7 +34,7 @@
 			import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
 			import {tetrahedron_off, icosahedron_off, cube_off, octahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
 
-			import {cc_slide, ds_slide, sqrt2_slide, sqrt3_slide, loop_slide} from './slides.js';
+			import {cc_slide, ds_slide, sqrt2_slide, sqrt3_slide, loop_slide, butterfly_slide} from './slides.js';
 
 			let slides = new Array();
 			slides["CatmullClark"] = cc_slide;
@@ -41,6 +42,7 @@
 			slides["Sqrt 3"] = sqrt3_slide;
 			slides["Sqrt 2"] = sqrt2_slide;
 			slides["Loop"] = loop_slide;
+			slides["Butterfly"] = butterfly_slide;
 
 			let active_slide;
 			Reveal.addEventListener('slidechanged', function(event) {
@@ -59,78 +61,10 @@
 				slides["Sqrt 3"].init(document.getElementById("Sqrt 3_div"), w, h);
 				slides["Sqrt 2"].init(document.getElementById("Sqrt 2_div"), w, h);
 				slides["Loop"].init(document.getElementById("Loop_div"), w, h);
-				slides["CatmullClark"].open();
-				// let canvas = document.getElementById("mycanvas");
-				// let div = document.getElementById("mycanvasdiv")
+				slides["Butterfly"].init(document.getElementById("Butterfly_div"), w, h);
 
-				// let cmap0 = new CMap0();
-				// const dart = CMap0.dart;
-				// let d0 = cmap0.new_dart();
-				// let d1 = cmap0.new_dart();
-				// let d2 = cmap0.new_dart();
-
-				// // cmap0.create_embedding(cmap0.vertex);
-				// cmap0.set_embeddings(cmap0.vertex);
-
-				// let position = cmap0.add_attribute(cmap0.vertex, "position");
-				// position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
-				// position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
-				// position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
-
-				// const scene = new THREE.Scene();
-				// scene.background = new THREE.Color(0x191919);
-				// const camera = new THREE.PerspectiveCamera(75, div.parentElement.parentElement.clientWidth / div.parentElement.parentElement.clientHeight, 0.1, 1000.0);
-				// camera.position.set(0, 0, 2);
-				
-				// const renderer = new THREE.WebGLRenderer();
-				// renderer.setSize( div.parentElement.parentElement.clientWidth, div.parentElement.parentElement.clientHeight );
-				// div.appendChild( renderer.domElement );
-
-				// // renderer.domElement.addEventListener('resize', function() {
-				// // 	const width = window.innerWidth;
-				// // 	const height = window.innerHeight;
-				// // 	renderer.setSize(width, height);
-				// // 	camera.aspect = width / height;
-				// // 	camera.updateProjectionMatrix();
-				// // 	console.log("geree ")
-				// // });
-
-				// let orbit_controls = new OrbitControls(camera, renderer.domElement)
-				// orbit_controls.enablePan = false;
-				// orbit_controls.update();
-				// // orbit_controls.addEventListener('change', render);
-
-				// let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
-				// scene.add(ambientLight);
-				// let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
-				// pointLight0.position.set(10,8,5);
-				// // let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
-				// // pointLight0.position.set(0, 0, 0);
-				// // pointLight1.position.set(-10,-8,-5);
-				// scene.add(pointLight0);
-				// // scene.add(pointLight1);
-
-				// let renderer0 = new Renderer(cmap0);
-				// renderer0.vertices.create({size: 0.25}).add(scene);
-				// function update ()
-				// {
-
-				// }
-
-				// function render()
-				// {
-				// renderer.render(scene, camera);
-				// }
-
-				// function mainloop()
-				// {
-				// 	// console.log("test")
-				// update();
-				// render();
-				// requestAnimationFrame(mainloop);
-				// }
-
-				// mainloop();
+				active_slide = slides["CatmullClark"];
+				active_slide.open();
 			});
 			
 		</script>
