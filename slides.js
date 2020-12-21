@@ -7,7 +7,7 @@ import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js'
 import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
 import {tetrahedron_off, icosahedron_off, cube_off, octahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
 import {catmull_clark} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
-import {fertility, metatron, santa, dinopet} from './mesh_files.js';
+import {fertility, metatron, santa, dinopet, test0_mesh} from './mesh_files.js';
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 import { sqrt3 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt3.js';
 import { sqrt2 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt2.js';
@@ -525,7 +525,7 @@ export let volume_slide = new Slide(
 		orbit_controls.update();
 
 		
-		this.cmap3 = load_cmap3('mesh', dinopet);
+		this.cmap3 = load_cmap3('mesh', metatron);
 		this.map_renderer = new Renderer(this.cmap3);
 		// this.map_renderer.edges.create({material: mesh_edge_material}).add(this.scene);
 		// this.cmap3.set_embeddings(this.cmap3.face);
@@ -593,7 +593,8 @@ export let volume_slide = new Slide(
 						break;
 
 				}
-				vec4 mvPosition = modelViewMatrix * vec4( p, 1.0);
+				p += position * 0.0;
+				vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
 				gl_Position = projectionMatrix * mvPosition;
 				pos = vec3(modelViewMatrix * vec4( p, 1.0));
 			}
