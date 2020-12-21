@@ -600,7 +600,7 @@ export let volume_slide = new Slide(
 		`;
 
 		let f_shader = `
-			precision mediump float;
+			precision highp float;
 
 			in vec3 pos;
 
