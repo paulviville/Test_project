@@ -1,4 +1,4 @@
-export function Slide(init_func){
+export default function Slide(init_func){
 	this.open = function(){
 		this.running = true;
 		this.loop();
