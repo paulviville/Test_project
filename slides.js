@@ -595,7 +595,7 @@ export let volume_slide = new Slide(
 				}
 				vec4 mvPosition = modelViewMatrix * vec4( p, 1.0);
 				gl_Position = projectionMatrix * mvPosition;
-				pos = vec3(modelMatrix * vec4( p, 1.0));
+				pos = vec3(modelViewMatrix * vec4( p, 1.0));
 			}
 		`;
 
