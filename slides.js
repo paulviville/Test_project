@@ -494,7 +494,7 @@ export let butterfly_slide = new Slide(
 	}
 );
 
-import Stats from './CMapJS/stats.module.js'
+import Stats from './stats.module.js'
 let stats = new Stats();
 document.body.appendChild(stats.dom);
 
@@ -559,10 +559,10 @@ export let volume_slide = new Slide(
 			void main() {
 				vec3 plane = vec3(-1, 0, -1);
 				vec3 p = center;
-				float scale = 0.85;
+				float scale = 0.95;
 
-				float min = - 0.1;
-				float max = 0.1;
+				float min = - 0.05;
+				float max = 0.0;
 				float value = dot(plane, vec3(modelMatrix * vec4(center, 1.0)));
 				value = clamp((value - min)/(max-min), 0.0, 1.0);
 				scale *= value;
