@@ -595,7 +595,7 @@ export let volume_slide = new Slide(
 				}
 				vec4 mvPosition = modelViewMatrix * vec4( p, 1.0);
 				gl_Position = projectionMatrix * mvPosition;
-				pos = (mvPosition).xyz;
+				pos = vec3(modelMatrix * vec4( p, 1.0));
 			}
 		`;
 
@@ -607,7 +607,7 @@ export let volume_slide = new Slide(
 			out vec4 fragColor;
 
 			void main(){
-				vec3 light_pos = vec3(0.75, 0.75, 0.75);
+				vec3 light_pos = vec3(10.75, 10.75,10.75);
 
 				float specular = 0.9;
 				float shine = 0.1;
