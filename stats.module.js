@@ -13,6 +13,7 @@ var Stats = function () {
 
 	//
 
+	
 	function addPanel( panel ) {
 
 		container.appendChild( panel.dom );
