@@ -613,15 +613,15 @@ export let volume_slide = new Slide(
 				float shine = 0.1;
 				
 				vec3 N = normalize(cross(dFdx(pos),dFdy(pos)));
-				//  vec3 L = normalize(light_pos - pos);
-				// float lamb = clamp(dot(N, L), 0.0, 1.0);
-				// vec3 E = normalize(-pos);
-				// vec3 R = reflect(-L, N);
-				// float spec = pow(max(dot(R,E), 0.0), specular);
-				// vec3 specCol = mix(vec3(1.0), vec3(1.0), shine);
-				// fragColor = vec4(mix(vec3(1.0) * lamb, specCol, spec), 1.0);
+				 vec3 L = normalize(light_pos - pos);
+				float lamb = clamp(dot(N, L), 0.0, 1.0);
+				vec3 E = normalize(-pos);
+				vec3 R = reflect(-L, N);
+				float spec = pow(max(dot(R,E), 0.0), specular);
+				vec3 specCol = mix(vec3(1.0), vec3(1.0), shine);
+				fragColor = vec4(mix(vec3(1.0) * lamb, specCol, spec), 1.0);
 
-				fragColor = vec4(N, 1.0);
+				// fragColor = vec4(N, 1.0);
 
 			}
 		`;
