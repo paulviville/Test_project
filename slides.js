@@ -882,7 +882,7 @@ export let volume_slide = new Slide(
 				this.time += this.clock.getDelta();
 
 				// this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
-				mesh.setRotationFromAxisAngle(axis, Math.PI / 15 * this.time)
+				mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
 				// mesh2.setRotationFromAxisAngle(axis, Math.PI / 15 * this.time)
 				// mesh3.setRotationFromAxisAngle(axis, Math.PI / 15 * this.time)
 				
