@@ -521,8 +521,8 @@ export let volume_slide = new Slide(
 		this.camera.position.set(0, 0, 2);
 
 		let orbit_controls = new OrbitControls(this.camera, this.renderer.domElement)
-		orbit_controls.enablePan = false;
-		orbit_controls.update();
+		// orbit_controls.enablePan = false;
+		// orbit_controls.update();
 
 		
 		let v_shader = `
@@ -537,6 +537,7 @@ export let volume_slide = new Slide(
 			in vec3 v5;
 			in vec3 v6;
 			in vec3 v7;
+			in vec3 color;
 
 			uniform mat4 modelMatrix;
 			uniform mat4 modelViewMatrix;
@@ -544,6 +545,7 @@ export let volume_slide = new Slide(
 			uniform vec3 cameraPos;
 
 			out vec3 pos;
+			out vec3 col;
 
 			void main() {
 				vec3 p = position;
@@ -589,6 +591,7 @@ export let volume_slide = new Slide(
 				vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
 				gl_Position = projectionMatrix * mvPosition;
 				pos = vec3(modelViewMatrix * vec4( p, 1.0));
+				col = color;
 			}
 		`;
 
@@ -596,13 +599,14 @@ export let volume_slide = new Slide(
 			precision highp float;
 
 			in vec3 pos;
+			in vec3 col;
 
 			out vec4 fragColor;
 
 			void main(){
-				vec3 light_pos = vec3(10.75, 10.75,10.75);
+				vec3 light_pos = vec3(10, 10, 0);
 
-				float specular = 0.9;
+				float specular = 0.3;
 				float shine = 0.1;
 				
 				vec3 N = normalize(cross(dFdx(pos),dFdy(pos)));
@@ -611,8 +615,9 @@ export let volume_slide = new Slide(
 				vec3 E = normalize(-pos);
 				vec3 R = reflect(-L, N);
 				float spec = pow(max(dot(R,E), 0.0), specular);
-				vec3 specCol = mix(vec3(1.0), vec3(1.0), shine);
-				fragColor = vec4(mix(vec3(1.0) * lamb, specCol, spec), 1.0);
+				vec3 specCol = mix(col, vec3(0.0), shine);
+				fragColor = vec4(mix(col * lamb, specCol, spec), 1.0);
+				// fragColor = vec4(mix(col * lamb, specCol, spec), 1.0);
 
 				// fragColor = vec4(N, 1.0);
 
@@ -632,9 +637,9 @@ export let volume_slide = new Slide(
 		let v5_array =  new Float32Array(nb_inst * 3);
 		let v6_array =  new Float32Array(nb_inst * 3);
 		let v7_array =  new Float32Array(nb_inst * 3);
-
+		let jacobians = [];
 		let centers = new Float32Array(nb_inst * 3);
-		let jacobian = new Float32Array(nb_inst);
+		// let jacobian = new Float32Array(nb_inst);
 		let n = 0;
 		let D = [];
 		let p0 = new THREE.Vector3;
@@ -647,7 +652,12 @@ export let volume_slide = new Slide(
 		let p7 = new THREE.Vector3;
 		
 		let center = new THREE.Vector3;
-		console.log(g)
+		console.log(g);
+
+		let avg_jacobian = 0;
+		let max_jacobian = -Infinity;
+		let min_jacobian = Infinity;
+
 		g.hex.forEach(hex => {
 			center.set(0, 0, 0);
 			p0.fromArray(g.v[hex[0]]);
@@ -701,7 +711,8 @@ export let volume_slide = new Slide(
 			let U = new THREE.Vector3;
 			let V = new THREE.Vector3;
 			let W = new THREE.Vector3;
-	
+			let F = new THREE.Matrix3;
+			let jacobian = Infinity;
 			U.add(p0).add(p1).add(p2).add(p3);
 			U.sub(p4).sub(p5).sub(p6).sub(p7);
 			U.normalize();
@@ -712,31 +723,79 @@ export let volume_slide = new Slide(
 			W.sub(p2).sub(p3).sub(p6).sub(p7);
 			W.normalize();
 
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			let sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
+
 			U.subVectors(p1, p0); V.subVectors(p4, p0); W.subVectors(p3, p0);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
+
 			U.subVectors(p0, p1); V.subVectors(p2, p1); W.subVectors(p5, p1);
-			U.normalize();V.normalize();W.normalize();
+			U.normalize();V.normalize();W.normalize();F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 
 			U.subVectors(p1, p2); V.subVectors(p3, p2); W.subVectors(p6, p2);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 
 			U.subVectors(p0, p3); V.subVectors(p7, p3); W.subVectors(p2, p3);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 
 			U.subVectors(p0, p4); V.subVectors(p5, p4); W.subVectors(p7, p4);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 			
 			U.subVectors(p1, p5); V.subVectors(p6, p5); W.subVectors(p4, p5);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 			
 			U.subVectors(p2, p6); V.subVectors(p7, p6); W.subVectors(p5, p6);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 			
 			U.subVectors(p3, p7); V.subVectors(p4, p7); W.subVectors(p6, p7);
 			U.normalize();V.normalize();W.normalize();
+			F.set(U.x, V.x, W.x, U.y, V.y, W.y, U.z, V.z, W.z);
+			sj = F.determinant();
+			if(sj < jacobian) jacobian = sj;
 	
+			if(jacobian > max_jacobian) max_jacobian = jacobian;
+			if(jacobian < min_jacobian) min_jacobian = jacobian;
+			avg_jacobian += jacobian;
+			jacobians.push(jacobian);
 		});
+		avg_jacobian /= g.hex.length;
 
+		let green = new THREE.Color(0x2EEE71);
+		let red = new THREE.Color(0xF74C3C);
+		let col = new THREE.Color();
+		let jacobian_diff = max_jacobian - min_jacobian;
+		let value = 0;
+		let jacobian_colors = [];
+		jacobians.forEach(j => {
+			value = (j - min_jacobian) / jacobian_diff;
+			col.copy(green).lerp(red, value);
+			jacobian_colors.push(col.r, col.g, col.b);
+			// console.log(col)
+		});
+		console.log(jacobian_colors)
+		jacobian_colors = new Float32Array(jacobian_colors);
+		console.log(jacobian_colors)
 		let geometry = new THREE.BufferGeometry();
 		let pos = [
 			0.1, -0.1, -0.1,
@@ -766,6 +825,7 @@ export let volume_slide = new Slide(
 
 		geometry.setIndex(indices);
 		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( pos, 3 ) );
+		geometry.setAttribute( 'color', new THREE.InstancedBufferAttribute( jacobian_colors, 3 ) );
 		geometry.setAttribute( 'center', new THREE.InstancedBufferAttribute( centers, 3 ) );
 		geometry.setAttribute( 'v0', new THREE.InstancedBufferAttribute( v0_array, 3 ) );
 		geometry.setAttribute( 'v1', new THREE.InstancedBufferAttribute( v1_array, 3 ) );
@@ -787,22 +847,6 @@ export let volume_slide = new Slide(
 
 			console.log(mat)
 		let mesh = new THREE.InstancedMesh(geometry, mat, nb_inst);
-		let p = new THREE.Vector3();
-		let matrix = new THREE.Matrix4();
-		// let color = new THREE.Color();
-		// for(let i = 0; i < nb_inst; ++i){
-		// 	matrix.setPosition(centers[i].x, centers[i].y, centers[i].z);
-		// 	mesh.setMatrixAt(i, matrix);
-		// 	mesh.setColorAt(i, color.setHex(0xffffff * Math.random()))
-		// }
-
-		// let i = 0;
-		// this.cmap3.foreach(this.cmap3.vertex, vd => {
-		// 	p.copy(position[this.cmap3.cell(this.cmap3.vertex, vd)]);
-		// 	matrix.setPosition(p.x, p.y, p.z);
-		// 	mesh.setMatrixAt(i++, matrix);
-		// });
-
 
 		this.scene.add(mesh);
 
