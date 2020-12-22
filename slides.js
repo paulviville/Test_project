@@ -496,6 +496,7 @@ export let butterfly_slide = new Slide(
 );
 
 import Stats from './stats.module.js'
+import { vessels_mesh} from './vessels.js'
 let stats = new Stats();
 document.body.appendChild(stats.dom);
 
@@ -581,6 +582,8 @@ export let volume_slide = new Slide(
 				float min = - 0.1;
 				float max = 0.0;
 				float value = dot(plane, vec3(modelMatrix * vec4(center, 1.0)));
+				vec3 c = vec3(modelMatrix * vec4(center, 1.0));
+				value = c.x * c.y * c.z ;
 				// float value = dot(plane, vec3(modelMatrix * vec4(center + p, 1.0)));
 				value = clamp((value - min)/(max-min), 0.0, 1.0);
 				scale *= (value * value);
@@ -849,7 +852,6 @@ export let volume_slide = new Slide(
 		let mesh = new THREE.InstancedMesh(geometry, mat, nb_inst);
 
 		this.scene.add(mesh);
-
 		// let mat2 = new THREE.RawShaderMaterial( {
 		// 	glslVersion: THREE.GLSL3,
 		// 	vertexShader: v_shader,
