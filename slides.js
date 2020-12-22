@@ -544,6 +544,10 @@ export let volume_slide = new Slide(
 			uniform mat4 modelViewMatrix;
 			uniform mat4 projectionMatrix;
 			uniform vec3 cameraPos;
+			uniform int clipping;
+			uniform int jacobian;
+			uniform vec3 mesh_color;
+			uniform float max_scale;
 
 			out vec3 pos;
 			out vec3 col;
@@ -551,50 +555,39 @@ export let volume_slide = new Slide(
 			void main() {
 				vec3 p = position;
 				switch(gl_VertexID){
-					case 0:
-						p = v0;
-						break;
-					case 1:
-						p = v1;
-						break;
-					case 2:
-						p = v2;
-						break;
-					case 3:
-						p = v3;
-						break;
-					case 4:
-						p = v4;
-						break;
-					case 5:
-						p = v5;
-						break;
-					case 6:
-						p = v6;
-						break;
-					case 7:
-						p = v7;
-						break;
+					case 0: p = v0; break;
+					case 1: p = v1; break;
+					case 2: p = v2; break;
+					case 3: p = v3; break; 
+					case 4: p = v4; break;
+					case 5: p = v5; break;
+					case 6: p = v6; break;
+					case 7: p = v7; break;
 				}
 
 				vec3 plane = vec3(-1, 0, -1);
-				float scale = 0.98;
+				float scale = max_scale;
 				float min = - 0.1;
 				float max = 0.0;
-				float value = dot(plane, vec3(modelMatrix * vec4(center, 1.0)));
+				// float value = dot(plane, vec3(modelMatrix * vec4(center, 1.0)));
 				vec3 c = vec3(modelMatrix * vec4(center, 1.0));
-				value = c.x * c.y * c.z ;
-				// float value = dot(plane, vec3(modelMatrix * vec4(center + p, 1.0)));
+				// value = c.x * c.y * c.z ;
+				float value = dot(plane, vec3(modelMatrix * vec4(center , 1.0)));
 				value = clamp((value - min)/(max-min), 0.0, 1.0);
-				scale *= (value * value);
+				scale *= (value);
+				if(clipping == 1){
+					c -= (max_scale - scale)  * plane;
+					c = vec3(inverse(modelMatrix) * vec4(c, 1.0));
+					p = (p * scale) + c;
+				}
+				else
+					p = (p * max_scale) + center;
 
-				p *= scale;
-				p += center;
 
 				vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
 				gl_Position = projectionMatrix * mvPosition;
 				pos = vec3(modelViewMatrix * vec4( p, 1.0));
-				col = color;
+				col = jacobian == 0 ? color : mesh_color;
 			}
 		`;
 
@@ -844,7 +837,13 @@ export let volume_slide = new Slide(
 			vertexShader: v_shader,
 			fragmentShader: f_shader,
 			depthTest: true,
-			depthWrite: true
+			depthWrite: true,
+			uniforms: {
+				clipping: {value: 1},
+				jacobian: {value: 1},
+				max_scale: {value: 0.98},
+				mesh_color: {value: new THREE.Color(0x60c3f4)}
+			}
 		} );
 
 
@@ -882,7 +881,7 @@ export let volume_slide = new Slide(
 				this.time += this.clock.getDelta();
 
 				// this.map_renderer.edges.mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
-				mesh.setRotationFromAxisAngle(axis, Math.PI / 7.5 * this.time)
+				mesh.setRotationFromAxisAngle(axis, Math.PI / 30 * this.time)
 				// mesh2.setRotationFromAxisAngle(axis, Math.PI / 15 * this.time)
 				// mesh3.setRotationFromAxisAngle(axis, Math.PI / 15 * this.time)
 				
@@ -902,44 +901,5 @@ export let volume_slide = new Slide(
 			this.running = false;
 		}
 
-		let clock = new THREE.Clock(true);
-
-		// console.log("loading geometry");
-		// clock.getDelta();
-		// let time = 0;
-		// let g = load_mesh(metatron);
-		// time = clock.getDelta();
-		// console.log(time);
-		// g = load_mesh(metatron);
-		// time = clock.getDelta();
-		// console.log(time);
-		// g = load_mesh(metatron);
-		// time = clock.getDelta();
-		// console.log(time);
-		// g = load_mesh(metatron);
-		// time = clock.getDelta();
-		// console.log(time);
-		// g = load_mesh(metatron);
-		// time = clock.getDelta();
-		// console.log(time);
-		// g = load_mesh(metatron);
-		// time = clock.getDelta();
-		// console.log(time);
-		// console.log("creating map");
-		// let m = map_from_geometry(g);
-		// time = clock.getDelta();
-		// console.log(time);
-		// m = map_from_geometry(g);
-		// time = clock.getDelta();
-		// console.log(time);
-		// m = map_from_geometry(g);
-		// time = clock.getDelta();
-		// console.log(time);
-		// m = map_from_geometry(g);
-		// time = clock.getDelta();
-		// console.log(time);
-		// m = map_from_geometry(g);
-		// time = clock.getDelta();
-		// console.log(time);
 	}
 );
