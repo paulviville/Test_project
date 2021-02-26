@@ -14,6 +14,14 @@ import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 
 import {GUI} from './CMapJS/Dependencies/dat.gui.module.js';
+import {cut_all_edges, quadrangulate_all_faces, triangulate_all_faces, triangulate_face} from './CMapJS/Utils/Subdivision.js';
+import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
+import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
+import { sqrt3 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt3.js';
+import { sqrt2 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt2.js';
+import { loop } from './CMapJS/Modeling/Subdivision/Surface/Loop.js';
+import { butterfly } from './CMapJS/Modeling/Subdivision/Surface/Butterfly.js';
+
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
 // let d0 = cmap0.new_dart();
@@ -74,6 +82,7 @@ window.addEventListener('resize', function() {
     camera.updateProjectionMatrix();
 });
 
+
 let orbit_controls = new OrbitControls(camera, renderer.domElement)
 orbit_controls.enablePan = false;
 orbit_controls.update();
@@ -96,7 +105,19 @@ let cmap2 = load_cmap2('off', icosahedron_off);
 // cmap2.set_embeddings(cmap2.edge);
 // cmap2.set_embeddings(cmap2.face);
 let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
+// let vd0 = triangulate_face(cmap2, 0);
+// console.log(vd0, cmap2.cell(cmap2.vertex, vd0))
+// pos2[cmap2.cell(cmap2.vertex, vd0)] = new THREE.Vector3;
 
+// let degree = 0;
+// let vid = cmap2.cell(cmap2.vertex, vd0);
+// pos2[vid] = new THREE.Vector3;
+// cmap2.foreach_dart_of(cmap2.vertex, vd0, d => {
+// 	++degree;
+// 	pos2[vid].add(pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[d])]);
+// });
+// pos2[vid].multiplyScalar(1 / degree);
+// console.log(degree)
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
@@ -108,7 +129,7 @@ let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
-// catmull_clark(cmap2);
+// doo_sabin(cmap2);
 catmull_clark_inter(cmap2);
 catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
@@ -116,8 +137,31 @@ catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
+
 // doo_sabin(cmap2);
 // doo_sabin(cmap2);
+
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+// loop(cmap2);
+
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// sqrt3(cmap2);
+// catmull_clark(cmap2);
 
 // let p2_1 = pos2[cmap2.cell(cmap2.vertex, 0)];
 // let p2_2 = pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[0])];
@@ -170,6 +214,7 @@ function onMouseDown(event)
 }
 
 window.addEventListener( 'pointerdown', onMouseDown, false );
+
 
 
 // function test({cache = undefined, indices = false}){
@@ -371,14 +416,14 @@ function render()
 	renderer.render(scene, camera);
 }
 
-function loop()
+function mainloop()
 {
     update();
     render();
-    requestAnimationFrame(loop);
+    requestAnimationFrame(mainloop);
 }
 
-loop();
+mainloop();
 
 // export {cmap0};
 // window.renderer2 = renderer2;
