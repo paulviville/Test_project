@@ -2,20 +2,19 @@ import {CMap0} from './CMapJS/CMap/CMap.js';
 import {CMap1} from './CMapJS/CMap/CMap.js';
 import {CMap2} from './CMapJS/CMap/CMap.js';
 import {CMap3} from './CMapJS/CMap/CMap.js';
-import Renderer from './CMapJS/Renderer.js';
-import * as THREE from './CMapJS/three.module.js';
-import {OrbitControls} from './CMapJS/OrbitsControls.js';
+import Renderer from './CMapJS/Rendering/Renderer.js';
+import * as THREE from './CMapJS/Dependencies/three.module.js';
+import {OrbitControls} from './CMapJS/Dependencies/OrbitsControls.js';
 import {load_cmap2} from './CMapJS/IO/Surface_Formats/CMap2_IO.js' 
 import {load_cmap3} from './CMapJS/IO/Volumes_Formats/CMap3_IO.js' 
 import {tetrahedron_off, icosahedron_off, cube_off, octahedron_off, cactus_off, fertility_off, metatron_off} from './off_files.js';
 import {test1_mesh, fertility, dinopet, santa, ortho3, cactus, test0_mesh, metatron} from './mesh_files.js';
-import {cut_all_edges, quadrangulate_all_faces, triangulate_all_faces, triangulate_face} from './CMapJS/Utils/Subdivision.js';
+import {cut_all_edges, quadrangulate_all_faces} from './CMapJS/Utils/Subdivision.js';
 import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
-import { sqrt3 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt3.js';
-import { sqrt2 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt2.js';
-import { loop } from './CMapJS/Modeling/Subdivision/Surface/Loop.js';
-import { butterfly } from './CMapJS/Modeling/Subdivision/Surface/Butterfly.js';
+
+import {GUI} from './CMapJS/Dependencies/dat.gui.module.js';
+
 
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
@@ -83,9 +82,9 @@ orbit_controls.enablePan = false;
 orbit_controls.update();
 // orbit_controls.addEventListener('change', render);
 
-let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.8);
+let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.5);
 scene.add(ambientLight);
-let pointLight0 = new THREE.PointLight(0x3137DD, 0.8);
+let pointLight0 = new THREE.PointLight(0x3137DD, 5);
 pointLight0.position.set(10,8,5);
 // let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
 // pointLight0.position.set(0, 0, 0);
@@ -118,10 +117,18 @@ let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // catmull_clark(cmap2);
+// doo_sabin(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
+// catmull_clark(cmap2);
 // catmull_clark(cmap2);
 // doo_sabin(cmap2);
 catmull_clark_inter(cmap2);
 catmull_clark_inter(cmap2);
+// catmull_clark_inter(cmap2);
+// catmull_clark_inter(cmap2);
+// catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
 
@@ -158,12 +165,51 @@ catmull_clark_inter(cmap2);
 
 let cmap2_base = load_cmap2('off', icosahedron_off);
 let renderer2_base = new Renderer(cmap2_base);
-renderer2_base.edges.create({size: 0.025}).add(scene);
+renderer2_base.edges.create({size: 4}).add(scene);
+// renderer2_base.vertices.create({size: 0.0125}).add(scene);
 
 let renderer2 = new Renderer(cmap2);
-// renderer2.vertices.create({size: 0.025}).add(scene);
-renderer2.edges.create({size: 0.025}).add(scene);
-renderer2.faces.create({size: 0.025}).add(scene);
+renderer2.vertices.create({size: 0.0015625 * 8}).add(scene);
+renderer2.edges.create({size: 1, color: 0x0055DD}).add(scene);
+renderer2.faces.create({}).add(scene);
+
+function onMouseMove(event)
+{
+
+}
+
+function onMouseUp(event)
+{
+    window.removeEventListener( 'mousemove', onMouseMove, false );
+    window.removeEventListener( 'mouseup', onMouseUp, false );
+}
+
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let id = undefined;
+function onMouseDown(event)
+{
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    let intersections = raycaster.intersectObject(renderer2.vertices.mesh);
+    if(intersections.length) {
+        if(id) renderer2.vertices.mesh.setColorAt(id, new THREE.Color(0xFF0000));
+        id = intersections[0].instanceId;
+        // console.log(renderer2.vertices.mesh);
+        renderer2.vertices.mesh.setColorAt(id, new THREE.Color(0x00FF00))
+        renderer2.vertices.mesh.instanceColor.needsUpdate = true;
+    }
+    else {
+        if(id) renderer2.vertices.mesh.setColorAt(id, new THREE.Color(0xFF0000));
+        renderer2.vertices.mesh.instanceColor.needsUpdate = true;
+    }
+}
+
+window.addEventListener( 'pointerdown', onMouseDown, false );
+
+
 
 // function test({cache = undefined, indices = false}){
 //     console.log(cache, indices);
