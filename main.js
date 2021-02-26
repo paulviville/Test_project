@@ -14,13 +14,7 @@ import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 
 import {GUI} from './CMapJS/Dependencies/dat.gui.module.js';
-import {cut_all_edges, quadrangulate_all_faces, triangulate_all_faces, triangulate_face} from './CMapJS/Utils/Subdivision.js';
-import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
-import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
-import { sqrt3 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt3.js';
-import { sqrt2 } from './CMapJS/Modeling/Subdivision/Surface/Sqrt2.js';
-import { loop } from './CMapJS/Modeling/Subdivision/Surface/Loop.js';
-import { butterfly } from './CMapJS/Modeling/Subdivision/Surface/Butterfly.js';
+
 
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
