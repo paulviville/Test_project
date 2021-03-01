@@ -13,8 +13,9 @@ import {cut_all_edges, quadrangulate_all_faces} from './CMapJS/Utils/Subdivision
 import {catmull_clark, catmull_clark_inter} from './CMapJS/Modeling/Subdivision/Surface/Catmull_Clark.js';
 import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 
-import {GUI} from './CMapJS/Dependencies/dat.gui.module.js';
+import {controllers, GUI} from './CMapJS/Dependencies/dat.gui.module.js';
 
+import {TransformControls} from './CMapJS/Dependencies/TransformControls.js'
 
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
@@ -82,6 +83,7 @@ orbit_controls.enablePan = false;
 orbit_controls.update();
 // orbit_controls.addEventListener('change', render);
 
+
 let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.5);
 scene.add(ambientLight);
 let pointLight0 = new THREE.PointLight(0x3137DD, 5);
@@ -125,7 +127,8 @@ let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
 // catmull_clark(cmap2);
 // doo_sabin(cmap2);
 catmull_clark_inter(cmap2);
-catmull_clark_inter(cmap2);
+// catmull_clark_inter(cmap2);
+
 // catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
 // catmull_clark_inter(cmap2);
@@ -171,7 +174,7 @@ renderer2_base.edges.create({size: 4}).add(scene);
 let renderer2 = new Renderer(cmap2);
 renderer2.vertices.create({size: 0.0015625 * 8}).add(scene);
 renderer2.edges.create({size: 1, color: 0x0055DD}).add(scene);
-renderer2.faces.create({}).add(scene);
+// renderer2.faces.create({}).add(scene);
 
 function onMouseMove(event)
 {
@@ -186,30 +189,51 @@ function onMouseUp(event)
 
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
-let id = undefined;
+let id = null;
+let mesh = null;
 function onMouseDown(event)
 {
+	console.log(event.detail)
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    let intersections = raycaster.intersectObject(renderer2.vertices.mesh);
-    if(intersections.length) {
-        if(id) renderer2.vertices.mesh.setColorAt(id, new THREE.Color(0xFF0000));
+    
+	let intersections = raycaster.intersectObject(renderer2.vertices.mesh);
+    
+	if(id != null) { 
+		mesh.setColorAt(id, new THREE.Color(0xFF0000));
+		id = null;
+		mesh.instanceColor.needsUpdate = true;
+	}
+
+	if(intersections.length) {
         id = intersections[0].instanceId;
-        // console.log(renderer2.vertices.mesh);
-        renderer2.vertices.mesh.setColorAt(id, new THREE.Color(0x00FF00))
-        renderer2.vertices.mesh.instanceColor.needsUpdate = true;
+		mesh = renderer2.vertices.mesh;
+        mesh.setColorAt(id, new THREE.Color(0x00FF00))
+        mesh.instanceColor.needsUpdate = true;
     }
     else {
-        if(id) renderer2.vertices.mesh.setColorAt(id, new THREE.Color(0xFF0000));
-        renderer2.vertices.mesh.instanceColor.needsUpdate = true;
+		intersections = raycaster.intersectObject(renderer2.edges.mesh);
+		if(intersections.length) {
+			id = intersections[0].instanceId;
+			mesh = renderer2.edges.mesh;
+			mesh.setColorAt(id, new THREE.Color(0x00FF00))
+			mesh.instanceColor.needsUpdate = true;
+		}
+		else {
+			// intersections = raycaster.intersectObject(renderer2.edges.mesh);
+		}
     }
 }
 
 window.addEventListener( 'pointerdown', onMouseDown, false );
-
-
+let transcontrols = new TransformControls(camera, renderer.domElement);
+transcontrols.addEventListener( 'dragging-changed', function ( event ) {
+	orbit_controls.enabled = ! event.value;
+} );
+transcontrols.attach(renderer2.vertices.mesh)
+scene.add(transcontrols)
 
 // function test({cache = undefined, indices = false}){
 //     console.log(cache, indices);
