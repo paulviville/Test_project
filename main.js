@@ -78,9 +78,9 @@ window.addEventListener('resize', function() {
 });
 
 
-let orbit_controls = new OrbitControls(camera, renderer.domElement)
-orbit_controls.enablePan = false;
-orbit_controls.update();
+// let orbit_controls = new OrbitControls(camera, renderer.domElement)
+// orbit_controls.enablePan = false;
+// orbit_controls.update();
 // orbit_controls.addEventListener('change', render);
 
 
@@ -88,14 +88,8 @@ let ambientLight = new THREE.AmbientLight(0xAAAAFF, 0.5);
 scene.add(ambientLight);
 let pointLight0 = new THREE.PointLight(0x3137DD, 5);
 pointLight0.position.set(10,8,5);
-// let pointLight1 = new THREE.PointLight(0xFFEEDD, 0.5);
-// pointLight0.position.set(0, 0, 0);
-// pointLight1.position.set(-10,-8,-5);
 scene.add(pointLight0);
-// scene.add(pointLight1);
 
-// let renderer0 = new Renderer(cmap0);
-// renderer0.vertices.create({size: 0.025}).add(scene);
 
 let cmap2 = load_cmap2('off', icosahedron_off);
 // cmap2.set_embeddings(cmap2.edge);
@@ -105,58 +99,11 @@ let pos2 = cmap2.get_attribute(cmap2.vertex, "position");
 // console.log(vd0, cmap2.cell(cmap2.vertex, vd0))
 // pos2[cmap2.cell(cmap2.vertex, vd0)] = new THREE.Vector3;
 
-// let degree = 0;
-// let vid = cmap2.cell(cmap2.vertex, vd0);
-// pos2[vid] = new THREE.Vector3;
-// cmap2.foreach_dart_of(cmap2.vertex, vd0, d => {
-// 	++degree;
-// 	pos2[vid].add(pos2[cmap2.cell(cmap2.vertex, cmap2.phi2[d])]);
-// });
-// pos2[vid].multiplyScalar(1 / degree);
-// console.log(degree)
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
 // doo_sabin(cmap2);
 // catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// catmull_clark(cmap2);
-// doo_sabin(cmap2);
 catmull_clark_inter(cmap2);
-// catmull_clark_inter(cmap2);
-
-// catmull_clark_inter(cmap2);
-// catmull_clark_inter(cmap2);
-// catmull_clark_inter(cmap2);
-// catmull_clark_inter(cmap2);
-// catmull_clark_inter(cmap2);
-
 // doo_sabin(cmap2);
-// doo_sabin(cmap2);
-
 // loop(cmap2);
-// loop(cmap2);
-// loop(cmap2);
-// loop(cmap2);
-// loop(cmap2);
-// loop(cmap2);
-// loop(cmap2);
-// loop(cmap2);
-
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
-// sqrt3(cmap2);
 // sqrt3(cmap2);
 // catmull_clark(cmap2);
 
@@ -176,16 +123,16 @@ renderer2.vertices.create({size: 0.0015625 * 8}).add(scene);
 renderer2.edges.create({size: 1, color: 0x0055DD}).add(scene);
 // renderer2.faces.create({}).add(scene);
 
-function onMouseMove(event)
-{
+// function onMouseMove(event)
+// {
 
-}
+// }
 
-function onMouseUp(event)
-{
-    window.removeEventListener( 'mousemove', onMouseMove, false );
-    window.removeEventListener( 'mouseup', onMouseUp, false );
-}
+// function onMouseUp(event)
+// {
+//     window.removeEventListener( 'mousemove', onMouseMove, false );
+//     window.removeEventListener( 'mouseup', onMouseUp, false );
+// }
 
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
@@ -227,13 +174,192 @@ function onMouseDown(event)
     }
 }
 
-window.addEventListener( 'pointerdown', onMouseDown, false );
-let transcontrols = new TransformControls(camera, renderer.domElement);
-transcontrols.addEventListener( 'dragging-changed', function ( event ) {
-	orbit_controls.enabled = ! event.value;
-} );
-transcontrols.attach(renderer2.vertices.mesh)
-scene.add(transcontrols)
+const map_handler = new(function(map){
+
+})(cmap2);
+
+// controls = {"type", func}
+function Mode(start, stop) {
+	let on = false;
+	this.start = function() {
+		start();
+		on = true;
+		return true;
+	};
+	this.stop = function(){
+		stop();
+		on = false;
+	};
+
+	this.toggle = function() {
+		on ? this.stop() : this.start();
+	}
+}	
+
+const event_handler = new (function(scope){
+	const orbit_controls = new OrbitControls(camera, scope)
+	orbit_controls.enablePan = false;
+	orbit_controls.mouseButtons.MIDDLE = THREE.MOUSE.ROTATE;
+	orbit_controls.mouseButtons.LEFT = null;
+	orbit_controls.mouseButtons.RIGHT = null;
+	const raycaster = new THREE.Raycaster;
+	const mouse = new THREE.Vector2;
+	
+	function set_mouse(event) {
+		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+	}
+
+	function raycast(target) {
+		raycaster.setFromCamera(mouse, camera);
+		const intersections = (Array.isArray(target) ? 
+			raycaster.intersectObjects(target):
+			raycaster.intersectObject(target));
+
+		return intersections[0];
+	}
+
+	let active_mode = undefined;
+	const key_held = new Array(1024).fill(false);
+
+	const selected_vertices = new Set;
+	const selected_edges = new Set;
+	const vertices = renderer2.vertices.mesh;
+	const edges = renderer2.edges.mesh;
+	let vertex = null;
+	let edge = null;
+
+	const selectMouseDown = function(event) {
+		set_mouse(event);
+		vertex = raycast(vertices);
+		console.log(vertex);
+		if(!vertex)
+			edge = raycast(edges);
+	}
+
+	const mode_select = new Mode(
+		() => {
+			scope.addEventListener( 'pointerdown', selectMouseDown, false );
+		},
+		() => {
+			scope.removeEventListener( 'pointerdown', selectMouseDown, false );
+		}
+	);
+
+	const OPdblClick = function(event) {
+		set_mouse(event);
+		vertex = raycast(vertices);
+		console.log(vertex)
+	}
+
+	const mode_orbit = new Mode(
+		() => {
+			orbit_controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+			scope.addEventListener('dblclick', OPdblClick, false);
+		},
+		() => {
+			scope.removeEventListener('dblclick', OPdblClick, false);
+			orbit_controls.mouseButtons.LEFT = null;
+		}
+	);
+
+	const mode_pan = new Mode(
+		() => {
+			scope.addEventListener('dblclick', OPdblClick);
+			orbit_controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+			orbit_controls.enablePan = true;
+		},
+		() => {
+			scope.removeEventListener('dblclick', OPdblClick);
+			orbit_controls.mouseButtons.LEFT = null;
+			orbit_controls.enablePan = false;
+		}
+	);
+
+	let transcontrols = new TransformControls(camera, renderer.domElement);
+	scene.add(transcontrols);
+	const mode_move = new Mode(
+		() => {
+			transcontrols.addEventListener( 'dragging-changed', function (event) {} );
+			transcontrols.attach(renderer2.vertices.mesh);
+		},
+		() => {
+			transcontrols.detach();
+		}
+	);
+
+	const defaultKeyDown = function(event){
+		key_held[event.which] = true;
+	};
+
+	const defaultKeyUp = function(event){
+		console.log(event.which, event.code, event.charCode);
+		let next_mode = undefined;
+		switch(event.code) {
+			case "Escape": // deselect
+				break;
+			case "Space": // select mode
+				next_mode = mode_select;
+				break;
+			case "Delete": // delete selection
+				break;
+			case "KeyA": // add vertices mode
+				break;
+			case "KeyC": // cut edge
+				break;
+			case "Key": // eraser
+				break;
+			case "KeyF": // create face
+				break
+			case "KeyL": // draw
+				break;
+			case "KeyM": // move
+				next_mode = mode_move;
+				break;
+			case "KeyO": // orbit
+				next_mode = mode_orbit;
+				break;
+			case "KeyP": // pan
+				next_mode = mode_pan;
+				break;
+		};
+
+		if(next_mode) {
+			if(active_mode) 
+				active_mode.stop();
+			active_mode = next_mode;
+			active_mode.start();
+		}
+
+		key_held[event.which] = false;
+
+	}
+
+	scope.addEventListener("keydown", defaultKeyDown);
+	scope.addEventListener("keyup", defaultKeyUp);
+	active_mode = mode_select;
+	active_mode.start();
+
+	return this;
+})(renderer.domElement);
+
+window.event_handler = event_handler;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // function test({cache = undefined, indices = false}){
 //     console.log(cache, indices);
