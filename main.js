@@ -299,11 +299,21 @@ const event_handler = new (function(scope, map_handler){
 	let edge = null;
 
 	const select_vertex = function(vd) {
+		if(selected_vertices.has(vd)) {
+			deselect_vertex(vd);
+			return;	
+		}
+
 		selected_vertices.add(vd);
 		map_handler.select_vertex(vd);
 	}
 
 	const select_edge = function(ed) {
+		if(selected_edges.has(ed)) {
+			deselect_edge(ed);
+			return;	
+		}
+
 		selected_edges.add(ed);
 		map_handler.select_edge(ed);
 	}
@@ -428,6 +438,7 @@ const event_handler = new (function(scope, map_handler){
 		let next_mode = undefined;
 		switch(event.code) {
 			case "Escape": // deselect
+				deselect_all();
 				break;
 			case "Space": // select mode
 				next_mode = mode_select;
