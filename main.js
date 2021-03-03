@@ -174,6 +174,9 @@ function onMouseDown(event)
     }
 }
 
+/// structure graphe d'incidence
+// opérations: ajouter sommet, connecter sommets/ajouter arete, ajouter face, couper arete
+
 const map_handler = new (function(map, params = {}){
 	const vertex = map.vertex;
 	const edge = map.edge;
@@ -236,6 +239,8 @@ const map_handler = new (function(map, params = {}){
 	};
 
 	this.update_vertices = function() {};
+	this.save_vertex_pos = function(vd) {};
+	this.saved_vertex_pos = function(vd) {};
 	this.update_vertex = function(vd) {};
 	this.update_meshes = function() {};
 	this.update_edges = function() {};
@@ -423,6 +428,7 @@ const event_handler = new (function(scope, map_handler){
 		() => {
 			transcontrols.addEventListener( 'dragging-changed', function (event) {} );
 			transcontrols.attach(map_handler.get_vertices_mesh());
+			console.log(transcontrols)
 		},
 		() => {
 			transcontrols.detach();
