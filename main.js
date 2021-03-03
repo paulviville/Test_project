@@ -43,21 +43,21 @@ import {TransformControls} from './CMapJS/Dependencies/TransformControls.js'
 // 		cmap0.foreach_dart_of(1, d, d1 => console.log(cmap0.cell(1, d), d1));
 // 	})
 
-let cmap1 = new CMap1();
-let f00 = cmap1.add_face(6);
-cmap1.set_embeddings(cmap1.edge);
-cmap1.set_embeddings(cmap1.vertex);
-cmap1.set_embeddings(cmap1.face);
+// let cmap1 = new CMap1();
+// let f00 = cmap1.add_face(6);
+// cmap1.set_embeddings(cmap1.edge);
+// cmap1.set_embeddings(cmap1.vertex);
+// cmap1.set_embeddings(cmap1.face);
 
-cmap1.mark_cell_as_boundary(cmap1.edge, f00);
+// cmap1.mark_cell_as_boundary(cmap1.edge, f00);
 
-let pos1_base = cmap1.add_attribute(cmap1.vertex, "position");
-pos1_base[cmap1.cell(cmap1.vertex, 0)] = new THREE.Vector3(0, 1, 0);
-pos1_base[cmap1.cell(cmap1.vertex, 1)] = new THREE.Vector3(-0.866, 0.5, 0);
-pos1_base[cmap1.cell(cmap1.vertex, 2)] = new THREE.Vector3(-0.866, -0.5, 0.2);
-pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
-pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
-pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
+// let pos1_base = cmap1.add_attribute(cmap1.vertex, "position");
+// pos1_base[cmap1.cell(cmap1.vertex, 0)] = new THREE.Vector3(0, 1, 0);
+// pos1_base[cmap1.cell(cmap1.vertex, 1)] = new THREE.Vector3(-0.866, 0.5, 0);
+// pos1_base[cmap1.cell(cmap1.vertex, 2)] = new THREE.Vector3(-0.866, -0.5, 0.2);
+// pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
+// pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
+// pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
 
 
@@ -115,12 +115,12 @@ catmull_clark_inter(cmap2);
 
 let cmap2_base = load_cmap2('off', icosahedron_off);
 let renderer2_base = new Renderer(cmap2_base);
-renderer2_base.edges.create({size: 4}).add(scene);
+// renderer2_base.edges.create({size: 4}).add(scene);
 // renderer2_base.vertices.create({size: 0.0125}).add(scene);
 
 let renderer2 = new Renderer(cmap2);
-renderer2.vertices.create({size: 0.0015625 * 8}).add(scene);
-renderer2.edges.create({size: 1, color: 0x0055DD}).add(scene);
+// renderer2.vertices.create({size: 0.0015625 * 8}).add(scene);
+// renderer2.edges.create({size: 1, color: 0x0055DD}).add(scene);
 // renderer2.faces.create({}).add(scene);
 
 // function onMouseMove(event)
@@ -174,29 +174,99 @@ function onMouseDown(event)
     }
 }
 
-const map_handler = new(function(map){
+const map_handler = new (function(map, params = {}){
+	const vertex = map.vertex;
+	const edge = map.edge;
 
-})(cmap2);
+	const renderer = new Renderer(map);
+	const position = map.get_attribute(vertex, "position");
 
-// controls = {"type", func}
-function Mode(start, stop) {
-	let on = false;
-	this.start = function() {
-		start();
-		on = true;
-		return true;
+	const vertex_color = params.vertex_color || new THREE.Color(0xFF0000);
+	const vertex_select_color = params.vertex_select_color || new THREE.Color(0x00FF00);
+	const edge_color = params.edge_color || new THREE.Color(0x0000DD);
+	const edge_select_color = params.edge_select_color || new THREE.Color(0x00FF00);
+
+	this.get_vertices_mesh = function() {
+		if(!renderer.vertices.mesh)
+			renderer.vertices.create({size: 0.0015625 * 6, color: vertex_color}); 
+
+		return renderer.vertices.mesh;
 	};
-	this.stop = function(){
-		stop();
-		on = false;
+
+	this.get_edges_mesh = function() {
+		if(!renderer.edges.mesh)
+			renderer.edges.create({size: 1, color: edge_color}); 
+
+		return renderer.edges.mesh;
 	};
 
-	this.toggle = function() {
-		on ? this.stop() : this.start();
-	}
-}	
+	this.get_position = function(vd) {
+		return position[map.cell(vertex, vd)].clone();
+	};
 
-const event_handler = new (function(scope){
+	this.get_edge_mid = function(ed) {
+		const p0 = position[map.cell(vertex, ed)].clone();
+		p0.add(position[map.cell(vertex, map.phi1[ed])]);
+		p0.divideScalar(2);
+		return p0;
+	};
+	
+	this.select_vertex = function(vd) {
+		let id = renderer.vertices.mesh.instanceId[map.cell(vertex, vd)];
+		renderer.vertices.mesh.setColorAt(id, vertex_select_color);
+		renderer.vertices.mesh.instanceColor.needsUpdate = true;
+	};
+
+	this.deselect_vertex = function(vd) {
+		let id = renderer.vertices.mesh.instanceId[map.cell(vertex, vd)];
+		renderer.vertices.mesh.setColorAt(id, vertex_color);
+		renderer.vertices.mesh.instanceColor.needsUpdate = true;
+	};
+
+	this.select_edge = function(ed) {
+		let id = renderer.edges.mesh.instanceId[map.cell(edge, ed)];
+		renderer.edges.mesh.setColorAt(id, edge_select_color);
+		renderer.edges.mesh.instanceColor.needsUpdate = true;
+	};
+
+	this.deselect_edge = function(ed) {
+		let id = renderer.edges.mesh.instanceId[map.cell(edge, ed)];
+		renderer.edges.mesh.setColorAt(id, edge_color);
+		renderer.edges.mesh.instanceColor.needsUpdate = true;
+	};
+
+	this.update_vertices = function() {};
+	this.update_vertex = function(vd) {};
+	this.update_meshes = function() {};
+	this.update_edges = function() {};
+	this.update_edge = function(ed) {};
+
+	// this.rescale_vertices
+})(cmap2, {});
+
+scene.add(map_handler.get_vertices_mesh());
+scene.add(map_handler.get_edges_mesh());
+
+
+
+const event_handler = new (function(scope, map_handler){
+	function Mode(start, stop) {
+		let on = false;
+		this.start = function() {
+			start();
+			on = true;
+			return true;
+		};
+		this.stop = function(){
+			stop();
+			on = false;
+		};
+	
+		this.toggle = function() {
+			on ? this.stop() : this.start();
+		}
+	}	
+
 	const orbit_controls = new OrbitControls(camera, scope)
 	orbit_controls.enablePan = false;
 	orbit_controls.mouseButtons.MIDDLE = THREE.MOUSE.ROTATE;
@@ -220,36 +290,97 @@ const event_handler = new (function(scope){
 	}
 
 	let active_mode = undefined;
-	const key_held = new Array(1024).fill(false);
+	const key_held = {};
 
 	const selected_vertices = new Set;
 	const selected_edges = new Set;
-	const vertices = renderer2.vertices.mesh;
-	const edges = renderer2.edges.mesh;
+
 	let vertex = null;
 	let edge = null;
 
+	const select_vertex = function(vd) {
+		selected_vertices.add(vd);
+		map_handler.select_vertex(vd);
+	}
+
+	const select_edge = function(ed) {
+		selected_edges.add(ed);
+		map_handler.select_edge(ed);
+	}
+
+	const deselect_all = function() {
+		selected_vertices.forEach(vd => deselect_vertex(vd));
+		selected_edges.forEach(ed => deselect_edge(ed));
+	}
+
+	const deselect_vertex = function(vd) {
+		selected_vertices.delete(vd);
+		map_handler.deselect_vertex(vd);
+	}
+
+	const deselect_edge = function(ed) {
+		selected_edges.delete(ed);
+		map_handler.deselect_edge(ed);
+	};
+
 	const selectMouseDown = function(event) {
 		set_mouse(event);
-		vertex = raycast(vertices);
-		console.log(vertex);
-		if(!vertex)
+		if(event.button == 0){
+			let vertices = map_handler.get_vertices_mesh();
+			vertex = raycast(vertices);
+			if(vertex) {
+				let vd = vertices.vd[vertex.instanceId];
+				if(!key_held.ShiftLeft)
+					deselect_all();
+
+				select_vertex(vd);
+				return;
+			}
+			
+			let edges = map_handler.get_edges_mesh();
 			edge = raycast(edges);
+			if(edge) {
+				let ed = edges.ed[edge.instanceId];
+				if(!key_held.ShiftLeft)
+					deselect_all();
+					
+				select_edge(ed);
+				return;
+			}
+
+			if(!key_held.ShiftLeft) 
+				deselect_all();
+		}
 	}
 
 	const mode_select = new Mode(
 		() => {
-			scope.addEventListener( 'pointerdown', selectMouseDown, false );
+			scope.addEventListener( 'pointerdown', selectMouseDown );
 		},
 		() => {
-			scope.removeEventListener( 'pointerdown', selectMouseDown, false );
+			scope.removeEventListener( 'pointerdown', selectMouseDown );
 		}
 	);
 
 	const OPdblClick = function(event) {
 		set_mouse(event);
+		let vertices = map_handler.get_vertices_mesh();
 		vertex = raycast(vertices);
-		console.log(vertex)
+		if(vertex) {
+			let p = map_handler.get_position(vertices.vd[vertex.instanceId]);
+			orbit_controls.target.copy(p)
+			orbit_controls.update();
+			return;
+		}
+
+		let edges = map_handler.get_edges_mesh();
+		edge = raycast(edges);
+		if(edge) {
+			let p = map_handler.get_edge_mid(edges.ed[edge.instanceId]);
+			orbit_controls.target.copy(p)
+			orbit_controls.update();
+			return;
+		}
 	}
 
 	const mode_orbit = new Mode(
@@ -281,7 +412,7 @@ const event_handler = new (function(scope){
 	const mode_move = new Mode(
 		() => {
 			transcontrols.addEventListener( 'dragging-changed', function (event) {} );
-			transcontrols.attach(renderer2.vertices.mesh);
+			transcontrols.attach(map_handler.get_vertices_mesh());
 		},
 		() => {
 			transcontrols.detach();
@@ -289,7 +420,7 @@ const event_handler = new (function(scope){
 	);
 
 	const defaultKeyDown = function(event){
-		key_held[event.which] = true;
+		key_held[event.code] = true;
 	};
 
 	const defaultKeyUp = function(event){
@@ -331,7 +462,7 @@ const event_handler = new (function(scope){
 			active_mode.start();
 		}
 
-		key_held[event.which] = false;
+		key_held[event.code] = false;
 
 	}
 
@@ -341,9 +472,10 @@ const event_handler = new (function(scope){
 	active_mode.start();
 
 	return this;
-})(renderer.domElement);
+})(renderer.domElement, map_handler);
 
 window.event_handler = event_handler;
+window.map_handler = map_handler;
 
 
 
@@ -571,10 +703,10 @@ mainloop();
 
 // export {cmap0};
 // window.renderer2 = renderer2;
-window.renderer3 = renderer3;
-window.light0 = pointLight0;
-// window.cmap0 = cmap0;
-window.cmap1 = cmap1;
-window.cmap2 = cmap2;
-window.cmap3 = cmap3;
-window.CMap0 = CMap0;
+// window.renderer3 = renderer3;
+// window.light0 = pointLight0;
+// // window.cmap0 = cmap0;
+// window.cmap1 = cmap1;
+// window.cmap2 = cmap2;
+// window.cmap3 = cmap3;
+// window.CMap0 = CMap0;
