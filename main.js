@@ -2,6 +2,7 @@ import {CMap0} from './CMapJS/CMap/CMap.js';
 import {CMap1} from './CMapJS/CMap/CMap.js';
 import {CMap2} from './CMapJS/CMap/CMap.js';
 import {CMap3} from './CMapJS/CMap/CMap.js';
+import Incidence_Graph from './CMapJS/CMap/Incidence_Graph.js';
 import Renderer from './CMapJS/Rendering/Renderer.js';
 import * as THREE from './CMapJS/Dependencies/three.module.js';
 import {OrbitControls} from './CMapJS/Dependencies/OrbitsControls.js';
@@ -16,6 +17,46 @@ import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 import {controllers, GUI} from './CMapJS/Dependencies/dat.gui.module.js';
 
 import {TransformControls} from './CMapJS/Dependencies/TransformControls.js'
+
+let incidence_graph = new Incidence_Graph();
+let igpos = incidence_graph.add_attribute(0, "position");
+let v0 = incidence_graph.add_vertex();
+igpos[v0] = new THREE.Vector3(0, 1, 0);
+let v1 = incidence_graph.add_vertex();
+igpos[v1] = new THREE.Vector3(-0.433, 0.25, 0);
+let v2 = incidence_graph.add_vertex();
+igpos[v2] = new THREE.Vector3(0.433, 0.25, 0);
+let v3 = incidence_graph.add_vertex();
+igpos[v3] = new THREE.Vector3(-0.866, -0.5, 0);
+let v4 = incidence_graph.add_vertex();
+igpos[v4] = new THREE.Vector3(0.0, -0.5, 0);
+let v5 = incidence_graph.add_vertex();
+igpos[v5] = new THREE.Vector3(0.866, -0.5, 0);
+// incidence_graph.delete_vertex(v5);
+incidence_graph.add_edge(v0, v1);
+incidence_graph.add_edge(v0, v2);
+incidence_graph.add_edge(v1, v2);
+incidence_graph.add_edge(v1, v3);
+incidence_graph.add_edge(v1, v4);
+incidence_graph.add_edge(v2, v4);
+incidence_graph.add_edge(v2, v5);
+incidence_graph.add_edge(v3, v4);
+incidence_graph.add_edge(v4, v5);
+// incidence_graph.delete_vertex(2);
+// incidence_graph.add_vertex();
+// incidence_graph.add_vertex();
+console.log(incidence_graph);
+incidence_graph.create_face(1, 2, 3, 4)
+incidence_graph.debug();
+
+
+let ig_renderer = new Renderer(incidence_graph);
+ig_renderer.vertices.create({color: new THREE.Color(0x00FF00)});
+ig_renderer.edges.create({color: new THREE.Color(0x00FF00)});
+
+
+
+
 
 // let cmap0 = new CMap0();
 // const dart = CMap0.dart;
@@ -77,6 +118,9 @@ window.addEventListener('resize', function() {
     camera.updateProjectionMatrix();
 });
 
+
+ig_renderer.vertices.add(scene);
+ig_renderer.edges.add(scene);
 
 // let orbit_controls = new OrbitControls(camera, renderer.domElement)
 // orbit_controls.enablePan = false;
