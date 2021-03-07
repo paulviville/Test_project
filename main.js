@@ -33,26 +33,37 @@ igpos[v4] = new THREE.Vector3(0.0, -0.5, 0);
 let v5 = incidence_graph.add_vertex();
 igpos[v5] = new THREE.Vector3(0.866, -0.5, 0);
 // incidence_graph.delete_vertex(v5);
-incidence_graph.add_edge(v0, v1);
-incidence_graph.add_edge(v0, v2);
-incidence_graph.add_edge(v1, v2);
-incidence_graph.add_edge(v1, v3);
-incidence_graph.add_edge(v1, v4);
-incidence_graph.add_edge(v2, v4);
-incidence_graph.add_edge(v2, v5);
-incidence_graph.add_edge(v3, v4);
-incidence_graph.add_edge(v4, v5);
-// incidence_graph.delete_vertex(2);
+let e0 = incidence_graph.add_edge(v0, v1);
+let e1 = incidence_graph.add_edge(v0, v2);
+let e2 = incidence_graph.add_edge(v1, v2);
+let e3 = incidence_graph.add_edge(v1, v3);
+let e4 = incidence_graph.add_edge(v1, v4);
+let e5 = incidence_graph.add_edge(v2, v4);
+let e6 = incidence_graph.add_edge(v2, v5);
+let e7 = incidence_graph.add_edge(v3, v4);
+let e8 = incidence_graph.add_edge(v4, v5);
+
+let f0 = incidence_graph.add_face(e0, e1, e2);
+let f1 = incidence_graph.add_face(e7, e3, e4);
+let f2 = incidence_graph.add_face(e8, e5, e6);
+let f3 = incidence_graph.add_face(e0, e7, e6);
+console.log(f3);
+let f4 = incidence_graph.add_face(e2, e5, e4);
+incidence_graph.delete_face(f4);
+// incidence_graph.delete_edge(e4);
+// incidence_graph.delete_edge(0);
+// incidence_graph.delete_vertex(0);
 // incidence_graph.add_vertex();
 // incidence_graph.add_vertex();
 console.log(incidence_graph);
-incidence_graph.create_face(1, 2, 3, 4)
 incidence_graph.debug();
 
+console.log(incidence_graph.nb_cells(2))
 
 let ig_renderer = new Renderer(incidence_graph);
 ig_renderer.vertices.create({color: new THREE.Color(0x00FF00)});
 ig_renderer.edges.create({color: new THREE.Color(0x00FF00)});
+ig_renderer.faces.create({color: new THREE.Color(0x00FFFF), side: THREE.DoubleSide});
 
 
 
@@ -121,6 +132,7 @@ window.addEventListener('resize', function() {
 
 ig_renderer.vertices.add(scene);
 ig_renderer.edges.add(scene);
+ig_renderer.faces.add(scene);
 
 // let orbit_controls = new OrbitControls(camera, renderer.domElement)
 // orbit_controls.enablePan = false;
