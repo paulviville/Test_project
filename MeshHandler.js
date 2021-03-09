@@ -5,7 +5,7 @@ import Renderer from './CMapJS/Rendering/Renderer.js';
 function MeshHandler (mesh, params = {}) {
 	const vertex = mesh.vertex;
 	const edge = mesh.edge;
-	// const face = mesh.face;
+	const face = mesh.face;
 
 	const renderer = new Renderer(mesh);
 	const position = mesh.get_attribute(vertex, "position");
@@ -85,22 +85,23 @@ function MeshHandler (mesh, params = {}) {
 		return (hit[0] ? hit[0].point : undefined);
 	};
 
-	this.selectHit = function (raycaster) {
-		let vertexHit = verticesMesh ? raycast(raycaster, verticesMesh) : undefined;
+	this.selectHit = function (raycaster, params) {
+		params = params ? params : {vertices: true, edges: true, faces: true};
+		let vertexHit = (verticesMesh && params.vertices)? raycast(raycaster, verticesMesh) : undefined;
 		if(vertexHit) {
 			let vid = vertexHit.instanceId;
 			selectedVertices.add(vid);
 			this.changeVertexColor(vid, vertex_select_color);
 			return vertexHit;
 		}
-		let edgeHit = edgesMesh ? raycast(raycaster, edgesMesh): undefined;
+		let edgeHit = (edgesMesh && params.edges) ? raycast(raycaster, edgesMesh): undefined;
 		if(edgeHit) {
 			let eid = edgeHit.instanceId;
 			selectedEdges.add(eid);
 			this.changeEdgeColor(eid, edge_select_color);
 			return edgeHit;
 		}
-		let faceHit = facesMesh ? raycast(raycaster, facesMesh) : undefined;
+		let faceHit = (facesMesh && params.faces) ? raycast(raycaster, facesMesh) : undefined;
 		if(faceHit) {
 			let fid = faceHit.faceIndex;
 			selectedFaces.add(fid);
@@ -111,8 +112,9 @@ function MeshHandler (mesh, params = {}) {
 		return undefined;
 	};
 
-	this.toggleSelectHit = function (raycaster) {
-		let vertexHit = verticesMesh ? raycast(raycaster, verticesMesh) : undefined;
+	this.toggleSelectHit = function (raycaster, params) {
+		params = params ? params : {vertices: true, edges: true, faces: true};
+		let vertexHit = (verticesMesh && params.vertices)? raycast(raycaster, verticesMesh) : undefined;
 		if(vertexHit) {
 			let vid = vertexHit.instanceId;
 			if(selectedVertices.has(vid)) {
@@ -125,7 +127,7 @@ function MeshHandler (mesh, params = {}) {
 			}
 			return vertexHit;
 		}
-		let edgeHit = edgesMesh ? raycast(raycaster, edgesMesh): undefined;
+		let edgeHit = (edgesMesh && params.edges) ? raycast(raycaster, edgesMesh): undefined;
 		if(edgeHit) {
 			let eid = edgeHit.instanceId;
 			if(selectedEdges.has(eid)) {
@@ -138,7 +140,7 @@ function MeshHandler (mesh, params = {}) {
 			}
 			return edgeHit;
 		}
-		let faceHit = facesMesh ? raycast(raycaster, facesMesh) : undefined;
+		let faceHit = (facesMesh && params.faces) ? raycast(raycaster, facesMesh) : undefined;
 		if(faceHit) {
 			let fid = faceHit.faceIndex;
 			if(selectedFaces.has(fid)) {
@@ -155,42 +157,79 @@ function MeshHandler (mesh, params = {}) {
 		return undefined;
 	};
 
-	this.deselectAll = function () {
-		selectedVertices.forEach(v => this.changeVertexColor(v, vertex_color));
-		selectedVertices.clear();
-		selectedEdges.forEach(e => this.changeEdgeColor(e, edge_color));
-		selectedEdges.clear();
-		selectedFaces.forEach(f => this.changeFaceColor(f, face_color));
-		selectedFaces.clear();
+	this.deselectAll = function (params) {
+		params = params ? params : {vertices: true, edges: true, faces: true};
+		if(params.vertices) {
+			selectedVertices.forEach(v => this.changeVertexColor(v, vertex_color));
+			selectedVertices.clear();
+		}
+
+		if(params.edges) {
+			selectedEdges.forEach(e => this.changeEdgeColor(e, edge_color));
+			selectedEdges.clear();
+		}
+
+		if(params.faces) {
+			selectedFaces.forEach(f => this.changeFaceColor(f, face_color));
+			selectedFaces.clear();
+		}
 	};
 
-	this.changeVertexColor = function(vid, color) {
+	this.hasSelection = function (params) {
+		params = params ? params : {vertices: true, edges: true, faces: true};
+		let hasSelection = 0;
+		hasSelection += (params.vertices ? selectedVertices.size : 0);
+		hasSelection += (params.edges ? selectedEdges.size : 0);
+		hasSelection += (params.faces ? selectedFaces.size : 0);
+		return hasSelection;
+	}
+
+	this.changeVertexColor = function (vid, color) {
 		verticesMesh.setColorAt(vid, color);
 		renderer.vertices.mesh.instanceColor.needsUpdate = true;
 	};
 
-	this.changeEdgeColor = function(eid, color) {
+	this.changeEdgeColor = function (eid, color) {
 		edgesMesh.setColorAt(eid, color);
 		edgesMesh.instanceColor.needsUpdate = true;
 	};
 
-	this.changeFaceColor = function(fid, color) {
+	this.changeFaceColor = function (fid, color) {
 		facesMesh.geometry.faces[fid].color.copy(color);
 		facesMesh.geometry.colorsNeedUpdate = true;
 	};
 
-	this.targetCenter = function(raycaster) {}
+	this.addFaceFromSelection = function () {
+		if(this.hasSelection({edges: true})) {
+			if(mesh.add_face(...selectedEdges) != undefined) {
+				this.updateFaces();
+				this.deselectAll({edges: true});
+				console.log(mesh.nb_cells(2));
+			}
+		}
+	};
 
-	this.getPosition = function(v) {};
+	this.addEdgeFromSelection = function () {
+		if(this.hasSelection({vertices: true})) {
+			let vertices = Array.from(selectedVertices);
+			mesh.add_edge(vertices[0], vertices[1])
+			this.updateEdges();
+			this.deselectAll({vertices: true});
+		}
+	};
 
-	this.getEdgeMid = function(e) {};
+	this.targetCenter = function (raycaster) {}
 
-	this.getFaceCenter = function(f) {};
+	this.getPosition = function (v) {};
 
-	this.saveVertexPos = function(v) {};
-	this.savedVertexPos = function(v) {};
-	this.updateVertex = function(v) {};
-	this.updateEdge = function(e) {};
+	this.getEdgeMid = function (e) {};
+
+	this.getFaceCenter = function (f) {};
+
+	this.saveVertexPos = function (v) {};
+	this.savedVertexPos = function (v) {};
+	this.updateVertex = function (v) {};
+	this.updateEdge = function (e) {};
 
 	// this.rescale_vertices
 
