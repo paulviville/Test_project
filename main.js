@@ -2,7 +2,7 @@ import {CMap0} from './CMapJS/CMap/CMap.js';
 import {CMap1} from './CMapJS/CMap/CMap.js';
 import {CMap2} from './CMapJS/CMap/CMap.js';
 import {CMap3} from './CMapJS/CMap/CMap.js';
-import Incidence_Graph from './CMapJS/CMap/Incidence_Graph.js';
+import IncidenceGraph from './CMapJS/CMap/IncidenceGraph.js';
 import Renderer from './CMapJS/Rendering/Renderer.js';
 import * as THREE from './CMapJS/Dependencies/three.module.js';
 import {OrbitControls} from './CMapJS/Dependencies/OrbitsControls.js';
@@ -17,8 +17,9 @@ import {doo_sabin} from './CMapJS/Modeling/Subdivision/Surface/Doo_Sabin.js';
 import {controllers, GUI} from './CMapJS/Dependencies/dat.gui.module.js';
 
 import {TransformControls} from './CMapJS/Dependencies/TransformControls.js'
+import MeshHandler from './MeshHandler.js';
 
-let incidence_graph = new Incidence_Graph();
+let incidence_graph = new IncidenceGraph();
 let igpos = incidence_graph.add_attribute(0, "position");
 let v0 = incidence_graph.add_vertex();
 igpos[v0] = new THREE.Vector3(0, 1, 0);
@@ -32,6 +33,8 @@ let v4 = incidence_graph.add_vertex();
 igpos[v4] = new THREE.Vector3(0.0, -0.5, 0);
 let v5 = incidence_graph.add_vertex();
 igpos[v5] = new THREE.Vector3(0.866, -0.5, 0);
+let v6 = incidence_graph.add_vertex();
+igpos[v6] = new THREE.Vector3(0, 0, 0);
 // incidence_graph.delete_vertex(v5);
 let e0 = incidence_graph.add_edge(v0, v1);
 let e1 = incidence_graph.add_edge(v0, v2);
@@ -42,6 +45,7 @@ let e5 = incidence_graph.add_edge(v2, v4);
 let e6 = incidence_graph.add_edge(v2, v5);
 let e7 = incidence_graph.add_edge(v3, v4);
 let e8 = incidence_graph.add_edge(v4, v5);
+let e9 = incidence_graph.add_edge(v4, v6);
 
 let f0 = incidence_graph.add_face(e0, e1, e2);
 let f1 = incidence_graph.add_face(e7, e3, e4);
@@ -62,54 +66,8 @@ console.log(incidence_graph.nb_cells(2))
 
 let ig_renderer = new Renderer(incidence_graph);
 ig_renderer.vertices.create({color: new THREE.Color(0x00FF00)});
-ig_renderer.edges.create({color: new THREE.Color(0x00FF00)});
+ig_renderer.edges.create({color: new THREE.Color(0xFF0000), size: 2.5});
 ig_renderer.faces.create({color: new THREE.Color(0x00FFFF), side: THREE.DoubleSide});
-
-
-
-
-
-// let cmap0 = new CMap0();
-// const dart = CMap0.dart;
-// let d0 = cmap0.new_dart();
-// let d1 = cmap0.new_dart();
-// let d2 = cmap0.new_dart();
-
-// // cmap0.create_embedding(cmap0.vertex);
-// cmap0.set_embeddings(cmap0.vertex);
-
-// let position = cmap0.add_attribute(cmap0.vertex, "position");
-// position[cmap0.cell(cmap0.vertex, d0)] = new THREE.Vector3(0, 1, 0);
-// position[cmap0.cell(cmap0.vertex, d1)] = new THREE.Vector3(-0.866, -0.5, 0);
-// position[cmap0.cell(cmap0.vertex, d2)] = new THREE.Vector3(0.866, -0.5, 0);
-
-
-// cmap0.delete_cell(cmap0.vertex, cmap0.cell(cmap0.vertex, d2));
-
-// console.log(d2, cmap0.cell(cmap0.vertex, d2));
-// cmap0.debug();
-
-
-// cmap0.foreach(1,
-// 	d => {
-// 		cmap0.foreach_dart_of(1, d, d1 => console.log(cmap0.cell(1, d), d1));
-// 	})
-
-// let cmap1 = new CMap1();
-// let f00 = cmap1.add_face(6);
-// cmap1.set_embeddings(cmap1.edge);
-// cmap1.set_embeddings(cmap1.vertex);
-// cmap1.set_embeddings(cmap1.face);
-
-// cmap1.mark_cell_as_boundary(cmap1.edge, f00);
-
-// let pos1_base = cmap1.add_attribute(cmap1.vertex, "position");
-// pos1_base[cmap1.cell(cmap1.vertex, 0)] = new THREE.Vector3(0, 1, 0);
-// pos1_base[cmap1.cell(cmap1.vertex, 1)] = new THREE.Vector3(-0.866, 0.5, 0);
-// pos1_base[cmap1.cell(cmap1.vertex, 2)] = new THREE.Vector3(-0.866, -0.5, 0.2);
-// pos1_base[cmap1.cell(cmap1.vertex, 3)] = new THREE.Vector3(0, -1, 0.2);
-// pos1_base[cmap1.cell(cmap1.vertex, 4)] = new THREE.Vector3(0.866, -0.5, 0.2);
-// pos1_base[cmap1.cell(cmap1.vertex, 5)] = new THREE.Vector3(0.866, 0.5, 0);
 
 
 
@@ -130,9 +88,9 @@ window.addEventListener('resize', function() {
 });
 
 
-ig_renderer.vertices.add(scene);
-ig_renderer.edges.add(scene);
-ig_renderer.faces.add(scene);
+// ig_renderer.vertices.add(scene);
+// ig_renderer.edges.add(scene);
+// ig_renderer.faces.add(scene);
 
 // let orbit_controls = new OrbitControls(camera, renderer.domElement)
 // orbit_controls.enablePan = false;
@@ -233,81 +191,9 @@ function onMouseDown(event)
 /// structure graphe d'incidence
 // opérations: ajouter sommet, connecter sommets/ajouter arete, ajouter face, couper arete
 
-const map_handler = new (function(map, params = {}){
-	const vertex = map.vertex;
-	const edge = map.edge;
-
-	const renderer = new Renderer(map);
-	const position = map.get_attribute(vertex, "position");
-
-	const vertex_color = params.vertex_color || new THREE.Color(0xFF0000);
-	const vertex_select_color = params.vertex_select_color || new THREE.Color(0x00FF00);
-	const edge_color = params.edge_color || new THREE.Color(0x0000DD);
-	const edge_select_color = params.edge_select_color || new THREE.Color(0x00FF00);
-
-	this.get_vertices_mesh = function() {
-		if(!renderer.vertices.mesh)
-			renderer.vertices.create({size: 0.0015625 * 6, color: vertex_color}); 
-
-		return renderer.vertices.mesh;
-	};
-
-	this.get_edges_mesh = function() {
-		if(!renderer.edges.mesh)
-			renderer.edges.create({size: 1, color: edge_color}); 
-
-		return renderer.edges.mesh;
-	};
-
-	this.get_position = function(vd) {
-		return position[map.cell(vertex, vd)].clone();
-	};
-
-	this.get_edge_mid = function(ed) {
-		const p0 = position[map.cell(vertex, ed)].clone();
-		p0.add(position[map.cell(vertex, map.phi1[ed])]);
-		p0.divideScalar(2);
-		return p0;
-	};
-	
-	this.select_vertex = function(vd) {
-		let id = renderer.vertices.mesh.instanceId[map.cell(vertex, vd)];
-		renderer.vertices.mesh.setColorAt(id, vertex_select_color);
-		renderer.vertices.mesh.instanceColor.needsUpdate = true;
-	};
-
-	this.deselect_vertex = function(vd) {
-		let id = renderer.vertices.mesh.instanceId[map.cell(vertex, vd)];
-		renderer.vertices.mesh.setColorAt(id, vertex_color);
-		renderer.vertices.mesh.instanceColor.needsUpdate = true;
-	};
-
-	this.select_edge = function(ed) {
-		let id = renderer.edges.mesh.instanceId[map.cell(edge, ed)];
-		renderer.edges.mesh.setColorAt(id, edge_select_color);
-		renderer.edges.mesh.instanceColor.needsUpdate = true;
-	};
-
-	this.deselect_edge = function(ed) {
-		let id = renderer.edges.mesh.instanceId[map.cell(edge, ed)];
-		renderer.edges.mesh.setColorAt(id, edge_color);
-		renderer.edges.mesh.instanceColor.needsUpdate = true;
-	};
-
-	this.update_vertices = function() {};
-	this.save_vertex_pos = function(vd) {};
-	this.saved_vertex_pos = function(vd) {};
-	this.update_vertex = function(vd) {};
-	this.update_meshes = function() {};
-	this.update_edges = function() {};
-	this.update_edge = function(ed) {};
-
-	// this.rescale_vertices
-})(cmap2, {});
-
-scene.add(map_handler.get_vertices_mesh());
-scene.add(map_handler.get_edges_mesh());
-
+const map_handler = new MeshHandler(incidence_graph);
+map_handler.initialize({vertices: true, edges: true, faces: true});
+map_handler.addMeshesTo(scene);
 
 
 const event_handler = new (function(scope, map_handler){
@@ -353,74 +239,52 @@ const event_handler = new (function(scope, map_handler){
 	let active_mode = undefined;
 	const key_held = {};
 
-	const selected_vertices = new Set;
-	const selected_edges = new Set;
-
 	let vertex = null;
 	let edge = null;
 
-	const select_vertex = function(vd) {
-		if(selected_vertices.has(vd)) {
-			deselect_vertex(vd);
-			return;	
-		}
+	// const select_vertex = function(vd) {
+	// 	if(selected_vertices.has(vd)) {
+	// 		deselect_vertex(vd);
+	// 		return;	
+	// 	}
 
-		selected_vertices.add(vd);
-		map_handler.select_vertex(vd);
-	}
+	// 	selected_vertices.add(vd);
+	// 	map_handler.select_vertex(vd);
+	// }
 
-	const select_edge = function(ed) {
-		if(selected_edges.has(ed)) {
-			deselect_edge(ed);
-			return;	
-		}
+	// const select_edge = function(ed) {
+	// 	if(selected_edges.has(ed)) {
+	// 		deselect_edge(ed);
+	// 		return;	
+	// 	}
 
-		selected_edges.add(ed);
-		map_handler.select_edge(ed);
-	}
+	// 	selected_edges.add(ed);
+	// 	map_handler.select_edge(ed);
+	// }
 
-	const deselect_all = function() {
-		selected_vertices.forEach(vd => deselect_vertex(vd));
-		selected_edges.forEach(ed => deselect_edge(ed));
-	}
+	// const deselect_all = function() {
+	// 	selected_vertices.forEach(vd => deselect_vertex(vd));
+	// 	selected_edges.forEach(ed => deselect_edge(ed));
+	// }
 
-	const deselect_vertex = function(vd) {
-		selected_vertices.delete(vd);
-		map_handler.deselect_vertex(vd);
-	}
+	// const deselect_vertex = function(vd) {
+	// 	selected_vertices.delete(vd);
+	// 	map_handler.deselect_vertex(vd);
+	// }
 
-	const deselect_edge = function(ed) {
-		selected_edges.delete(ed);
-		map_handler.deselect_edge(ed);
-	};
+	// const deselect_edge = function(ed) {
+	// 	selected_edges.delete(ed);
+	// 	map_handler.deselect_edge(ed);
+	// };
 
 	const selectMouseDown = function(event) {
 		set_mouse(event);
 		if(event.button == 0){
-			let vertices = map_handler.get_vertices_mesh();
-			vertex = raycast(vertices);
-			if(vertex) {
-				let vd = vertices.vd[vertex.instanceId];
-				if(!key_held.ShiftLeft)
-					deselect_all();
+			raycaster.setFromCamera(mouse, camera);
+			if(!key_held.ShiftLeft)
+				map_handler.deselectAll();
 
-				select_vertex(vd);
-				return;
-			}
-			
-			let edges = map_handler.get_edges_mesh();
-			edge = raycast(edges);
-			if(edge) {
-				let ed = edges.ed[edge.instanceId];
-				if(!key_held.ShiftLeft)
-					deselect_all();
-					
-				select_edge(ed);
-				return;
-			}
-
-			if(!key_held.ShiftLeft) 
-				deselect_all();
+			let hit = key_held.ShiftLeft ? map_handler.toggleSelectHit(raycaster) : map_handler.selectHit(raycaster);
 		}
 	}
 
@@ -435,22 +299,11 @@ const event_handler = new (function(scope, map_handler){
 
 	const OPdblClick = function(event) {
 		set_mouse(event);
-		let vertices = map_handler.get_vertices_mesh();
-		vertex = raycast(vertices);
-		if(vertex) {
-			let p = map_handler.get_position(vertices.vd[vertex.instanceId]);
-			orbit_controls.target.copy(p)
+		raycaster.setFromCamera(mouse, camera);
+		let point = map_handler.positionHit(raycaster);
+		if(point) {
+			orbit_controls.target.copy(point)
 			orbit_controls.update();
-			return;
-		}
-
-		let edges = map_handler.get_edges_mesh();
-		edge = raycast(edges);
-		if(edge) {
-			let p = map_handler.get_edge_mid(edges.ed[edge.instanceId]);
-			orbit_controls.target.copy(p)
-			orbit_controls.update();
-			return;
 		}
 	}
 
@@ -500,12 +353,13 @@ const event_handler = new (function(scope, map_handler){
 		let next_mode = undefined;
 		switch(event.code) {
 			case "Escape": // deselect
-				deselect_all();
+				map_handler.deselectAll();
 				break;
 			case "Space": // select mode
 				next_mode = mode_select;
 				break;
 			case "Delete": // delete selection
+				map_handler.deleteSelection();
 				break;
 			case "KeyA": // add vertices mode
 				break;
