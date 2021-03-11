@@ -199,51 +199,73 @@ const event_handler = new (function(scope, map_handler){
 
 
 
-	let sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(0.01, 10, 10), new THREE.MeshLambertMaterial({color: 0x000000}));
+	let sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(0.01, 10, 10), new THREE.MeshLambertMaterial({color: 0x0000FF}));
+	let sphereDelta = new THREE.Mesh(new THREE.SphereBufferGeometry(0.01, 10, 10), new THREE.MeshLambertMaterial({color: 0x00FF00}));
 		
 	const getGizmoConstraint = function () {
 		if(keyHeld.Digit1)
-			return keyHeld.ShiftLeft ? gizmo.constrain.YZ : gizmo.constrain.X;
+			return keyHeld.ShiftLeft ? gizmo.constrain.X : gizmo.constrain.YZ;
 
 		if(keyHeld.Digit2)
-			return keyHeld.ShiftLeft ? gizmo.constrain.XZ : gizmo.constrain.Y;
+			return keyHeld.ShiftLeft ? gizmo.constrain.Y : gizmo.constrain.XZ;
 
 		if(keyHeld.Digit3)
-			return keyHeld.ShiftLeft ? gizmo.constrain.XY : gizmo.constrain.Z;
+			return keyHeld.ShiftLeft ? gizmo.constrain.Z : gizmo.constrain.XY;
+	}
+
+	const worldPos0 = new THREE.Vector3;
+	const delta = new THREE.Vector3;
+
+	const moveMouseMove = function(event) {
+		setMouse(event);
+		raycaster.setFromCamera(mouse, camera);
+		let p = gizmo.positionHit(raycaster, getGizmoConstraint());
+		console.log(delta)
+		delta.subVectors(p, worldPos0);
+		sphere.position.copy(p);
+		map_handler.displaceSelection(delta);
+	}
+
+	const moveMouseUp = function(event) {
+		scope.removeEventListener( 'pointermove', moveMouseMove );
+		scope.removeEventListener( 'pointerup', moveMouseUp );
 	}
 
 	const moveMouseDown = function(event) {
 		setMouse(event);
-		if(event.button == 0){
+		if(!map_handler.hasSelection())
+			selectMouseDown(event);
+
+		if(event.button == 0 && map_handler.hasSelection()){
+			map_handler.saveSelectionPosition();
 			raycaster.setFromCamera(mouse, camera);
-			let p = gizmo.positionHit(raycaster, getGizmoConstraint());
-			sphere.position.copy(p);
+			let hit = map_handler.positionHit(raycaster);
+			if(hit){
+				gizmo.setPosition(hit);
+				gizmo.update(camera);
+				worldPos0.copy(gizmo.position);
+			}
+			else
+				worldPos0.copy(gizmo.positionHit(raycaster, getGizmoConstraint()));
+			
+			sphere.position.copy(worldPos0);
+			sphereDelta.position.copy(worldPos0);
 			scope.addEventListener( 'pointermove', moveMouseMove );
 			scope.addEventListener( 'pointerup', moveMouseUp );
 			
 		}
 	}
 
-	const moveMouseMove = function(event) {
-		setMouse(event);
-			raycaster.setFromCamera(mouse, camera);
-			let p = gizmo.positionHit(raycaster, getGizmoConstraint());
-			sphere.position.copy(p);
-	}
-
-	const moveMouseUp = function(event) {
-		scope.removeEventListener( 'pointermove', moveMouseMove );
-		scope.removeEventListener( 'pointerup', moveMouseUp );
-
-	}
-	
 	const modeMove = new Mode(
 		() => {
 			scene.add(sphere);
+			scene.add(sphereDelta);
 			scope.addEventListener( 'pointerdown', moveMouseDown );
 		},
 		() => {
 			scene.remove(sphere);
+			scene.remove(sphereDelta);
+			scope.removeEventListener( 'pointerdown', moveMouseDown );
 		}
 	);
 
@@ -290,6 +312,44 @@ const event_handler = new (function(scope, map_handler){
 		}
 	);
 	
+	const extrudeMouseDown = function(event) {
+		setMouse(event);
+		map_handler.deselectAll();
+		if(event.button == 0){
+			raycaster.setFromCamera(mouse, camera);
+
+			let vertexHit = map_handler.selectHit(raycaster, {vertices: true});
+			if(vertexHit) {
+				let vid0 = vertexHit.instanceId;
+				console.log(vertexHit)
+				let vid1 = map_handler.addVertex(vertexHit.point);
+				map_handler.selectVertex(vid1);
+				map_handler.addEdgeFromSelection();
+				map_handler.selectVertex(vid1);
+				moveMouseDown(event);
+				return;
+			}
+
+			let edgeHit = map_handler.selectHit(raycaster, {edges: true});
+			if(edgeHit) {
+				let eid0 = edgeHit.instanceId;
+				let eid1 = map_handler.extrudeEdge(eid0);
+				map_handler.deselectEdge(eid0);
+				map_handler.deselectAll();
+				map_handler.selectEdge(eid1);
+				moveMouseDown(event);
+			}
+		}
+	}
+	const modeExtrude = new Mode(
+		() => {
+			map_handler.deselectAll();
+			scope.addEventListener( 'pointerdown', extrudeMouseDown );
+		},
+		() => {
+			scope.removeEventListener( 'pointerdown', extrudeMouseDown );
+		},
+	);
 
 	const defaultKeyDown = function(event){
 		keyHeld[event.code] = true;
@@ -309,10 +369,12 @@ const event_handler = new (function(scope, map_handler){
 				map_handler.deleteSelection();
 				break;
 			case "KeyA": // add vertices mode
+
 				break;
 			case "KeyC": // cut edge
 				break;
-			case "KeyE": // eraser
+			case "KeyE": // extrude
+				nextMode = modeExtrude;
 				break;
 			case "KeyF": // create face
 				nextMode = modeAddFace;
@@ -353,7 +415,7 @@ const event_handler = new (function(scope, map_handler){
 
 window.event_handler = event_handler;
 window.map_handler = map_handler;
-
+window.mesh = incidence_graph;
 
 
 
@@ -375,13 +437,3 @@ function mainloop()
 }
 
 mainloop();
-
-// export {cmap0};
-// window.renderer2 = renderer2;
-// window.renderer3 = renderer3;
-// window.light0 = pointLight0;
-// // window.cmap0 = cmap0;
-// window.cmap1 = cmap1;
-// window.cmap2 = cmap2;
-// window.cmap3 = cmap3;
-// window.CMap0 = CMap0;

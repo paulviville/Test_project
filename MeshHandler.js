@@ -9,7 +9,7 @@ function MeshHandler (mesh, params = {}) {
 
 	const renderer = new Renderer(mesh);
 	const position = mesh.get_attribute(vertex, "position");
-	const saved_position = mesh.add_attribute(vertex, "saved_position");
+	const savedPosition = mesh.add_attribute(vertex, "savedPosition");
 
 	const vertex_color = params.vertex_color || new THREE.Color(0xFF0000);
 	const vertex_select_color = params.vertex_select_color || new THREE.Color(0x00FF00);
@@ -21,7 +21,7 @@ function MeshHandler (mesh, params = {}) {
 	const selectedVertices = new Set;
 	const selectedEdges = new Set;
 	const selectedFaces = new Set;
-	const selection_vertices = new Set;
+	const selectionVertices = new Set;
 
 	let parentObject;
 	let verticesMesh, edgesMesh, facesMesh;
@@ -61,7 +61,7 @@ function MeshHandler (mesh, params = {}) {
 	this.updateFaces = function() {
 		renderer.faces.update();
 		facesMesh = renderer.faces.mesh;
-		console.log(facesMesh)
+		// console.log(facesMesh)
 	}
 
 	this.updateMeshes = function () {
@@ -184,6 +184,26 @@ function MeshHandler (mesh, params = {}) {
 		return hasSelection;
 	}
 
+	this.selectVertex = function (vid) {
+		selectedVertices.add(vid);
+		this.changeVertexColor(vid, vertex_select_color);
+	};
+
+	this.deselectVertex = function (vid) {
+		selectedVertices.delete(vid);
+		this.changeVertexColor(vid, vertex_color);
+	};
+
+	this.selectEdge = function (eid) {
+		selectedEdges.add(eid);
+		this.changeEdgeColor(eid, edge_select_color);
+	};
+
+	this.deselectEdge = function (eid) {
+		selectedEdges.delete(eid);
+		this.changeEdgeColor(eid, edge_color);
+	};
+
 	this.changeVertexColor = function (vid, color) {
 		verticesMesh.setColorAt(vid, color);
 		renderer.vertices.mesh.instanceColor.needsUpdate = true;
@@ -201,21 +221,102 @@ function MeshHandler (mesh, params = {}) {
 
 	this.addFaceFromSelection = function () {
 		if(this.hasSelection({edges: true})) {
-			if(mesh.add_face(...selectedEdges) != undefined) {
+			const edges = Array.from(selectedEdges).map(eid => edgesMesh.ed[eid]);
+			if(mesh.add_face(...edges) != undefined) {
 				this.updateFaces();
 				this.deselectAll({edges: true});
-				console.log(mesh.nb_cells(2));
 			}
 		}
 	};
 
 	this.addEdgeFromSelection = function () {
-		if(this.hasSelection({vertices: true})) {
+		if(this.hasSelection({vertices: true}) == 2) {
 			let vertices = Array.from(selectedVertices);
-			mesh.add_edge(vertices[0], vertices[1])
+			let v0 = verticesMesh.vd[vertices[0]];
+			let v1 = verticesMesh.vd[vertices[1]];
+			let ed = mesh.add_edge(v0, v1);
 			this.updateEdges();
 			this.deselectAll({vertices: true});
+			return ed;
 		}
+	};
+
+	this.addVertex = function (pos) {
+		let v = mesh.add_vertex();
+		position[v] = pos.clone();
+		this.updateVertices();
+		let vid = mesh.get_attribute(vertex, "instanceId")[v];
+		return vid;
+	};
+
+	this.extrudeEdge = function (eid) {
+		let e0 = edgesMesh.ed[eid];
+		let e0v = [];
+		let e1v = [];
+		let es = [];
+		mesh.foreach_incident(vertex, edge, e0, v0 => {
+			e0v.push(v0);
+			let v1 = mesh.add_vertex();
+			e1v.push(v1);
+			position[v1] = position[v0].clone();
+			es.push(mesh.add_edge(v0, v1));
+		});
+
+		let e1 = mesh.add_edge(e1v[0], e1v[1]);
+		mesh.add_face(e0, es[0], e1, es[1]);
+
+		this.updateVertices();
+		this.updateEdges();
+		this.updateFaces();
+
+		return mesh.get_attribute(edge, "instanceId")[e1];
+	};
+
+	// TODO: mesh.cell(vertex, v) for cmap compatibility
+	this.saveSelectionPosition = function () {
+		selectionVertices.clear();
+
+		selectedVertices.forEach(vid => {
+			selectionVertices.add(verticesMesh.vd[vid]);
+		});
+
+		selectedEdges.forEach(eid => {
+			let e = edgesMesh.ed[eid];
+			mesh.foreach_incident(vertex, edge, e, v => {
+				selectionVertices.add(v);
+			});
+		});
+
+		selectedFaces.forEach(fid => {
+			let f = facesMesh.fd[fid];
+			mesh.foreach_incident(vertex, face, f, v => {
+				selectionVertices.add(v);
+			});
+		});
+
+		selectionVertices.forEach(v => {
+			savedPosition[v] = position[v].clone();
+
+		});
+	};
+
+	this.displaceSelection = function (delta) {
+		selectionVertices.forEach(vd => {
+			position[vd].addVectors(savedPosition[vd], delta);
+		});
+		this.updateVertices();
+		this.updateEdges();
+		this.updateFaces();
+		this.recolorSelection();
+	};
+
+	this.cancelSelectionMove = function () {
+		selectionVertices.forEach(vd => {
+			position[vd].copy(savedPosition[vd]);
+		});
+		this.updateVertices();
+		this.updateEdges();
+		this.updateFaces();
 	};
 
 	this.targetCenter = function (raycaster) {}
@@ -232,6 +333,26 @@ function MeshHandler (mesh, params = {}) {
 	this.updateEdge = function (e) {};
 
 	// this.rescale_vertices
+
+	this.recolorSelection = function () {
+		if(selectedFaces.size) {
+			selectedFaces.forEach(fid => {
+				this.changeFaceColor(fid, face_select_color);
+			});
+		}
+
+		if(selectedEdges.size) {
+			selectedEdges.forEach(eid => {
+				this.changeEdgeColor(eid, edge_select_color);
+			});
+		}
+
+		if(selectedVertices.size) {
+			selectedVertices.forEach(vid => {
+				this.changeVertexColor(vid, vertex_select_color);	
+			});
+		}
+	}
 
 	this.deleteSelection = function () {
 		const update = {};
@@ -268,6 +389,7 @@ function MeshHandler (mesh, params = {}) {
 		update.vertices ? this.updateVertices() : undefined;
 		update.edges ? this.updateEdges() : undefined;
 		update.faces ? this.updateFaces() : undefined;
+		this.recolorSelection();
 	};
 }
 

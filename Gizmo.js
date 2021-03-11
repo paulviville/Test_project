@@ -13,10 +13,10 @@ function Gizmo () {
 
 	this.initialize = function () {
 		const geometry = new THREE.PlaneGeometry( 100, 100 );
-		const wMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, transparent: true, opacity: 0.25} );
-		const xMaterial = new THREE.MeshBasicMaterial( {color: 0xff0000, side: THREE.DoubleSide, transparent: true, opacity: 0.25} );
-		const yMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.25} );
-		const zMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, side: THREE.DoubleSide, transparent: true, opacity: 0.25} );
+		const wMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );
+		const xMaterial = new THREE.MeshBasicMaterial( {color: 0xff0000, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );
+		const yMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );
+		const zMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );
 		xPlane = new THREE.Mesh(geometry, xMaterial);
 		yPlane = new THREE.Mesh(geometry, yMaterial);
 		zPlane = new THREE.Mesh(geometry, zMaterial);
