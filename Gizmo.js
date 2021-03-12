@@ -12,7 +12,7 @@ function Gizmo () {
 	let xPlane, yPlane, zPlane, wPlane;
 
 	this.initialize = function () {
-		const geometry = new THREE.PlaneGeometry( 100, 100 );
+		const geometry = new THREE.PlaneGeometry( 1000, 1000 );
 		const wMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );
 		const xMaterial = new THREE.MeshBasicMaterial( {color: 0xff0000, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );
 		const yMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.125} );

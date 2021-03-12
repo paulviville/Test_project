@@ -31,7 +31,7 @@ function MeshHandler (mesh, params = {}) {
 			verticesMesh = renderer.vertices.mesh;
 		}
 		if(params.edges) {
-			renderer.edges.create({size: 1, color: edge_color}); 
+			renderer.edges.create({size: 1.5, color: edge_color}); 
 			edgesMesh = renderer.edges.mesh;
 		}
 		if(params.faces) {
@@ -81,8 +81,29 @@ function MeshHandler (mesh, params = {}) {
 	};
 
 	this.positionHit = function (raycaster) {
-		const hit = raycaster.intersectObjects([verticesMesh, edgesMesh, facesMesh]);
+		let targets = [];
+		if(verticesMesh) targets.push(verticesMesh);
+		if(edgesMesh) targets.push(edgesMesh);
+		if(facesMesh) targets.push(facesMesh);
+		console.log(facesMesh)
+		const hit = raycaster.intersectObjects(targets);
 		return (hit[0] ? hit[0].point : undefined);
+	};
+
+	this.edgePoint = function (eid, point) {
+		let e0 = edgesMesh.ed[eid];
+		let projection = new THREE.Vector3;
+		let A = new THREE.Vector3;
+		let B = new THREE.Vector3;
+		let vs = [];
+		mesh.foreach_incident(vertex, edge, e0, v => {
+			vs.push(v);
+		});
+		B.subVectors(position[vs[1]], position[vs[0]]);
+		A.subVectors(point, position[vs[0]]);
+		B.multiplyScalar(A.dot(B) / B.dot(B));
+		projection.add(B).add(position[vs[0]]);
+		return projection;
 	};
 
 	this.selectHit = function (raycaster, params) {
@@ -271,6 +292,20 @@ function MeshHandler (mesh, params = {}) {
 
 		return mesh.get_attribute(edge, "instanceId")[e1];
 	};
+
+	this.cutEdge = function (eid, point) {
+		console.log(eid, point, edgesMesh.ed[eid])
+		let p = this.edgePoint(eid, point)
+		let v = mesh.cutEdge(edgesMesh.ed[eid]);
+		position[v] = p;
+		this.updateVertices();
+		this.updateEdges();
+
+		let vid = mesh.get_attribute(vertex, "instanceId")[v];
+		mesh.debug();
+		console.log(position)
+		return vid;
+	}
 
 	// TODO: mesh.cell(vertex, v) for cmap compatibility
 	this.saveSelectionPosition = function () {

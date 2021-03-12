@@ -201,7 +201,8 @@ const event_handler = new (function(scope, map_handler){
 
 	let sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(0.01, 10, 10), new THREE.MeshLambertMaterial({color: 0x0000FF}));
 	let sphereDelta = new THREE.Mesh(new THREE.SphereBufferGeometry(0.01, 10, 10), new THREE.MeshLambertMaterial({color: 0x00FF00}));
-		
+	let sphereEdge = new THREE.Mesh(new THREE.SphereBufferGeometry(0.01, 10, 10), new THREE.MeshLambertMaterial({color: 0xFFFF00}));
+	scene.add(sphereEdge);
 	const getGizmoConstraint = function () {
 		if(keyHeld.Digit1)
 			return keyHeld.ShiftLeft ? gizmo.constrain.X : gizmo.constrain.YZ;
@@ -338,6 +339,7 @@ const event_handler = new (function(scope, map_handler){
 				map_handler.deselectAll();
 				map_handler.selectEdge(eid1);
 				moveMouseDown(event);
+
 			}
 		}
 	}
@@ -348,6 +350,35 @@ const event_handler = new (function(scope, map_handler){
 		},
 		() => {
 			scope.removeEventListener( 'pointerdown', extrudeMouseDown );
+		},
+	);
+
+
+	
+	const cutEdgeMouseDown = function(event) {
+		setMouse(event);
+		map_handler.deselectAll();
+		if(event.button == 0){
+			raycaster.setFromCamera(mouse, camera);
+
+			let edgeHit = map_handler.selectHit(raycaster, {edges: true});
+			if(edgeHit) {
+				let eid0 = edgeHit.instanceId;
+				let vid = map_handler.cutEdge(eid0, edgeHit.point)
+				map_handler.deselectAll();
+				map_handler.selectVertex(vid);
+				moveMouseDown(event);
+				// sphereEdge.position.copy(map_handler.edgePoint(edgeHit.point, eid0));
+			}
+		}
+	}
+	const modeCutEdge = new Mode(
+		() => {
+			map_handler.deselectAll();
+			scope.addEventListener( 'pointerdown', cutEdgeMouseDown );
+		},
+		() => {
+			scope.removeEventListener( 'pointerdown', cutEdgeMouseDown );
 		},
 	);
 
@@ -372,6 +403,7 @@ const event_handler = new (function(scope, map_handler){
 
 				break;
 			case "KeyC": // cut edge
+				nextMode = modeCutEdge;
 				break;
 			case "KeyE": // extrude
 				nextMode = modeExtrude;
