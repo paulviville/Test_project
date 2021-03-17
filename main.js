@@ -20,38 +20,43 @@ import {TransformControls} from './CMapJS/Dependencies/TransformControls.js'
 import MeshHandler from './MeshHandler.js';
 import Gizmo from './Gizmo.js';
 
+
+import {importIncidenceGraph} from './CMapJS/IO/IncidenceGraphFormats/IncidenceGraphIO.js';
+import {test0_ig} from './ig_files.js';
+let ig = importIncidenceGraph("ig", test0_ig);
+
 let incidence_graph = new IncidenceGraph();
 let igpos = incidence_graph.add_attribute(0, "position");
-let v0 = incidence_graph.add_vertex();
-igpos[v0] = new THREE.Vector3(0, 1, 0);
-let v1 = incidence_graph.add_vertex();
-igpos[v1] = new THREE.Vector3(-0.433, 0.25, 0);
-let v2 = incidence_graph.add_vertex();
-igpos[v2] = new THREE.Vector3(0.433, 0.25, 0);
-let v3 = incidence_graph.add_vertex();
-igpos[v3] = new THREE.Vector3(-0.866, -0.5, 0);
-let v4 = incidence_graph.add_vertex();
-igpos[v4] = new THREE.Vector3(0.0, -0.5, 0);
-let v5 = incidence_graph.add_vertex();
-igpos[v5] = new THREE.Vector3(0.866, -0.5, 0);
-let v6 = incidence_graph.add_vertex();
-igpos[v6] = new THREE.Vector3(0, 0, 0);
+// let v0 = incidence_graph.add_vertex();
+// igpos[v0] = new THREE.Vector3(0, 1, 0);
+// let v1 = incidence_graph.add_vertex();
+// igpos[v1] = new THREE.Vector3(-0.433, 0.25, 0);
+// let v2 = incidence_graph.add_vertex();
+// igpos[v2] = new THREE.Vector3(0.433, 0.25, 0);
+// let v3 = incidence_graph.add_vertex();
+// igpos[v3] = new THREE.Vector3(-0.866, -0.5, 0);
+// let v4 = incidence_graph.add_vertex();
+// igpos[v4] = new THREE.Vector3(0.0, -0.5, 0);
+// let v5 = incidence_graph.add_vertex();
+// igpos[v5] = new THREE.Vector3(0.866, -0.5, 0);
+// let v6 = incidence_graph.add_vertex();
+// igpos[v6] = new THREE.Vector3(0, 0, 0);
 
-let e0 = incidence_graph.add_edge(v0, v1);
-let e1 = incidence_graph.add_edge(v0, v2);
-let e2 = incidence_graph.add_edge(v1, v2);
-let e3 = incidence_graph.add_edge(v1, v3);
-let e4 = incidence_graph.add_edge(v1, v4);
-let e5 = incidence_graph.add_edge(v2, v4);
-let e6 = incidence_graph.add_edge(v2, v5);
-let e7 = incidence_graph.add_edge(v3, v4);
-let e8 = incidence_graph.add_edge(v4, v5);
-let e9 = incidence_graph.add_edge(v4, v6);
+// let e0 = incidence_graph.add_edge(v0, v1);
+// let e1 = incidence_graph.add_edge(v0, v2);
+// let e2 = incidence_graph.add_edge(v1, v2);
+// let e3 = incidence_graph.add_edge(v1, v3);
+// let e4 = incidence_graph.add_edge(v1, v4);
+// let e5 = incidence_graph.add_edge(v2, v4);
+// let e6 = incidence_graph.add_edge(v2, v5);
+// let e7 = incidence_graph.add_edge(v3, v4);
+// let e8 = incidence_graph.add_edge(v4, v5);
+// let e9 = incidence_graph.add_edge(v4, v6);
 
-let f0 = incidence_graph.add_face(e0, e1, e2);
-let f1 = incidence_graph.add_face(e7, e3, e4);
-let f2 = incidence_graph.add_face(e8, e5, e6);
-let f3 = incidence_graph.add_face(e0, e7, e6);
+// let f0 = incidence_graph.add_face(e0, e1, e2);
+// let f1 = incidence_graph.add_face(e7, e3, e4);
+// let f2 = incidence_graph.add_face(e8, e5, e6);
+// let f3 = incidence_graph.add_face(e0, e7, e6);
 
 
 let ig_renderer = new Renderer(incidence_graph);
@@ -90,7 +95,7 @@ scene.add(pointLight0);
 
 
 
-const map_handler = new MeshHandler(incidence_graph);
+const map_handler = new MeshHandler(ig);
 map_handler.initialize({vertices: true, edges: true, faces: true});
 map_handler.addMeshesTo(scene);
 let gizmo = new Gizmo();
