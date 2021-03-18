@@ -21,10 +21,11 @@ import MeshHandler from './MeshHandler.js';
 import Gizmo from './Gizmo.js';
 
 
-import {importIncidenceGraph} from './CMapJS/IO/IncidenceGraphFormats/IncidenceGraphIO.js';
+import {importIncidenceGraph, exportIncidenceGraph} from './CMapJS/IO/IncidenceGraphFormats/IncidenceGraphIO.js';
 import {test0_ig} from './ig_files.js';
 let ig = importIncidenceGraph("ig", test0_ig);
-
+window.ig = ig;
+window.exportIncidenceGraph = exportIncidenceGraph;
 let incidence_graph = new IncidenceGraph();
 let igpos = incidence_graph.add_attribute(0, "position");
 // let v0 = incidence_graph.add_vertex();
