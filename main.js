@@ -73,6 +73,74 @@ function Grid2D (params = {}) {
 		}
 	}
 	
+	const extrudeMouseDown = function(event) {
+		setMouse(event);
+		map_handler.deselectAll();
+		if(event.button == 0){
+			raycaster.setFromCamera(mouse, camera);
+
+			let vertexHit = map_handler.selectHit(raycaster, {vertices: true});
+			if(vertexHit) {
+				let vid0 = vertexHit.instanceId;
+				console.log(vertexHit)
+				let vid1 = map_handler.addVertex(vertexHit.point);
+				map_handler.selectVertex(vid1);
+				map_handler.addEdgeFromSelection();
+				map_handler.selectVertex(vid1);
+				moveMouseDown(event);
+				return;
+			}
+
+			let edgeHit = map_handler.selectHit(raycaster, {edges: true});
+			if(edgeHit) {
+				let eid0 = edgeHit.instanceId;
+				let eid1 = map_handler.extrudeEdge(eid0);
+				map_handler.deselectEdge(eid0);
+				map_handler.deselectAll();
+				map_handler.selectEdge(eid1);
+				moveMouseDown(event);
+
+			}
+		}
+	}
+	const modeExtrude = new Mode(
+		() => {
+			map_handler.deselectAll();
+			scope.addEventListener( 'pointerdown', extrudeMouseDown );
+		},
+		() => {
+			scope.removeEventListener( 'pointerdown', extrudeMouseDown );
+		},
+	);
+
+
+	
+	const cutEdgeMouseDown = function(event) {
+		setMouse(event);
+		map_handler.deselectAll();
+		if(event.button == 0){
+			raycaster.setFromCamera(mouse, camera);
+
+			let edgeHit = map_handler.selectHit(raycaster, {edges: true});
+			if(edgeHit) {
+				let eid0 = edgeHit.instanceId;
+				let vid = map_handler.cutEdge(eid0, edgeHit.point)
+				map_handler.deselectAll();
+				map_handler.selectVertex(vid);
+				moveMouseDown(event);
+				// sphereEdge.position.copy(map_handler.edgePoint(edgeHit.point, eid0));
+			}
+		}
+	}
+	const modeCutEdge = new Mode(
+		() => {
+			map_handler.deselectAll();
+			scope.addEventListener( 'pointerdown', cutEdgeMouseDown );
+		},
+		() => {
+			scope.removeEventListener( 'pointerdown', cutEdgeMouseDown );
+		},
+	);
 
 
 
@@ -82,7 +150,6 @@ function Grid2D (params = {}) {
 
 
 window.Grid2D = Grid2D;
-
 
 
 
