@@ -15,8 +15,6 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 const orbit_controls = new OrbitControls(camera, renderer.domElement)
 
-console.log(camera.rotation)
-
 window.addEventListener('resize', function() {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -38,13 +36,9 @@ function Grid2D (params = {}) {
 		ymin = -1, ymax = 1,
 		xdivs = 10,	ydivs = 10 } = params;
 
-	const map = new CMap2;
+	CMap2.call(this);
+
 	const grid = new Array(xdivs * ydivs);
-	
-	
-	this.getMap = function () {
-		return map;
-	};
 
 	this.getCell = function (i, j) {
 		return grid[i + j * xdivs];
@@ -55,13 +49,13 @@ function Grid2D (params = {}) {
 		const d = this.getCell(i, j);
 		switch(v) {
 			case 1:
-				vd = map.phi1[d];
+				vd = this.phi1[d];
 				break;
 			case 2:
-				vd = map.phi1[map.phi1[d]];
+				vd = this.phi1[this.phi1[d]];
 				break;
 			case 3:
-				vd = map.phi_1[d];
+				vd = this.phi_1[d];
 				break;
 			default:
 				vd = d;
@@ -77,45 +71,45 @@ function Grid2D (params = {}) {
 
 		for(let i = 0; i < ydivs; ++i) {
 			for(let j = 0; j < xdivs; ++j) {
-				const fd00 = map.addFace1(4);
+				const fd00 = this.addFace1(4);
 				grid[j + i * xdivs] = fd00;
 				if(j > 0) {
 					const ed00 = this.getEdge(j, i, 3);
 					const ed10 = this.getEdge(j - 1, i, 1);
-					map.sew_phi2(ed00, ed10);
+					this.sewPhi2(ed00, ed10);
 				}
 				if(i > 0) {
 					const ed00 = this.getEdge(j, i, 0);
 					const ed10 = this.getEdge(j, i - 1, 2);
-					map.sew_phi2(ed00, ed10);
+					this.sewPhi2(ed00, ed10);
 				}
 			}
 		}
 
-		map.close();
-		map.setEmbeddings(map.vertex);
-		const position = map.addAttribute(map.vertex, "position");
+		this.close();
+		this.setEmbeddings(this.vertex);
+		const position = this.addAttribute(this.vertex, "position");
 
 		let vd = this.getVertex(0, 0, 0);
-		position[map.cell(map.vertex, vd)] = new THREE.Vector3(xmin, ymin, 0);
+		position[this.cell(this.vertex, vd)] = new THREE.Vector3(xmin, ymin, 0);
 
 		for(let j = 0; j < xdivs; ++j) {
 			const pos1 = new THREE.Vector3(xmin + xstep * (j + 1), ymin, 0);
-			position[map.cell(map.vertex, this.getVertex(j, 0, 1))] = pos1;
+			position[this.cell(this.vertex, this.getVertex(j, 0, 1))] = pos1;
 		}
 
 		for(let i = 0; i < ydivs; ++i) {
-			position[map.cell(map.vertex, this.getVertex(0, i, 3))] = new THREE.Vector3(xmin, ymin + ystep * (i+1), 0);
+			position[this.cell(this.vertex, this.getVertex(0, i, 3))] = new THREE.Vector3(xmin, ymin + ystep * (i+1), 0);
 			for(let j = 0; j < xdivs; ++j) {
 				const pos2 = new THREE.Vector3(xmin + xstep * (j+1), ymin + xstep * (i+1), 0);
-				position[map.cell(map.vertex, this.getVertex(j, i, 2))] = pos2;
+				position[this.cell(this.vertex, this.getVertex(j, i, 2))] = pos2;
 			}
 		}
 
 
 
-		map.foreach(map.vertex, vd => {console.log(map.cell(map.vertex, vd), position[map.cell(map.vertex, vd)])});
-		console.log(map.nbCells(map.vertex), map.nbCells(map.edge), map.nbCells(map.face));
+		this.foreach(this.vertex, vd => {console.log(this.cell(this.vertex, vd), position[this.cell(this.vertex, vd)])});
+		console.log(this.nbCells(this.vertex), this.nbCells(this.edge), this.nbCells(this.face));
 	}
 
 	this.initGrid();
@@ -126,13 +120,40 @@ function Grid2D (params = {}) {
 
 window.Grid2D = Grid2D;
 
-let g = new Grid2D;
-let gridRenderer = new Renderer(g.getMap());
+let grid = new Grid2D;
+
+const vertexValue = grid.addAttribute(grid.vertex, "value");
+const vertexPos = grid.getAttribute(grid.vertex, "position");
+
+const radius = 0.5;
+function circleVal(pos) {
+	return pos.x * pos.x + pos.y * pos.y - radius * radius;
+}
+
+grid.foreach(grid.vertex, vd => {
+	let vpos = vertexPos[grid.cell(grid.vertex, vd)];
+	// vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
+	vertexValue[grid.cell(grid.vertex, vd)] = Math.pow(-1, ((vpos.x * vpos.y) > 0 ));
+});
+
+
+let gridRenderer = new Renderer(grid);
 gridRenderer.vertices.create({size: 0.025});
 gridRenderer.vertices.addTo(scene);
 gridRenderer.edges.create({size: 2});
 gridRenderer.edges.addTo(scene);
 
+const vertexPosColor = new THREE.Color(0x00FF00);
+const vertexNegColor = new THREE.Color(0xFF0000);
+
+const vertexIId = grid.getAttribute(grid.vertex, "instanceId");
+
+grid.foreach(grid.vertex, vd => {
+	const viid = vertexIId[grid.cell(grid.vertex, vd)];
+	const val = vertexValue[grid.cell(grid.vertex, vd)];
+	gridRenderer.vertices.mesh.setColorAt(viid, val > 0 ? vertexPosColor : vertexNegColor);
+});
+gridRenderer.vertices.mesh.instanceColor.needsUpdate = true;
 
 function update ()
 {
