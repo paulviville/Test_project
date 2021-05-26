@@ -1,4 +1,4 @@
-import {CMap2} from './CMapJS/CMap/CMap.js';
+import {CMap1, CMap2, Graph} from './CMapJS/CMap/CMap.js';
 import Renderer from './CMapJS/Rendering/Renderer.js';
 import * as THREE from './CMapJS/Libs/three.module.js';
 import { OrbitControls } from './CMapJS/Libs/OrbitsControls.js';
@@ -13,7 +13,8 @@ camera.position.set(0, 0, 2);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
-const orbit_controls = new OrbitControls(camera, renderer.domElement)
+const orbitControls = new OrbitControls(camera, renderer.domElement)
+orbitControls.enablePan = false;
 
 window.addEventListener('resize', function() {
     const width = window.innerWidth;
@@ -86,7 +87,7 @@ function Grid2D (params = {}) {
 			}
 		}
 
-		this.close();
+		this.close(true);
 		this.setEmbeddings(this.vertex);
 		const position = this.addAttribute(this.vertex, "position");
 
@@ -105,18 +106,12 @@ function Grid2D (params = {}) {
 				position[this.cell(this.vertex, this.getVertex(j, i, 2))] = pos2;
 			}
 		}
-
-
-
-		this.foreach(this.vertex, vd => {console.log(this.cell(this.vertex, vd), position[this.cell(this.vertex, vd)])});
-		console.log(this.nbCells(this.vertex), this.nbCells(this.edge), this.nbCells(this.face));
 	}
 
 	this.initGrid();
 
 	return this;
 }
-
 
 window.Grid2D = Grid2D;
 
@@ -133,7 +128,8 @@ function circleVal(pos) {
 grid.foreach(grid.vertex, vd => {
 	let vpos = vertexPos[grid.cell(grid.vertex, vd)];
 	// vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
-	vertexValue[grid.cell(grid.vertex, vd)] = Math.pow(-1, ((vpos.x * vpos.y) > 0 ));
+	vertexValue[grid.cell(grid.vertex, vd)] = -1;
+	// vertexValue[grid.cell(grid.vertex, vd)] = Math.pow(-1, ((vpos.x * vpos.y) > 0 ));
 });
 
 
@@ -151,9 +147,73 @@ const vertexIId = grid.getAttribute(grid.vertex, "instanceId");
 grid.foreach(grid.vertex, vd => {
 	const viid = vertexIId[grid.cell(grid.vertex, vd)];
 	const val = vertexValue[grid.cell(grid.vertex, vd)];
+	// gridRenderer.vertices.mesh.setColorAt(viid, val > 0 ? vertexPosColor : vertexNegColor);
 	gridRenderer.vertices.mesh.setColorAt(viid, val > 0 ? vertexPosColor : vertexNegColor);
 });
 gridRenderer.vertices.mesh.instanceColor.needsUpdate = true;
+
+
+function toggleVertexVal(vd) {
+	vertexValue[grid.cell(grid.vertex, vd)] *= -1;
+	const viid = vertexIId[grid.cell(grid.vertex, vd)];
+	gridRenderer.vertices.mesh.setColorAt(viid, vertexValue[grid.cell(grid.vertex, vd)] > 0 ? vertexPosColor : vertexNegColor);
+	gridRenderer.vertices.mesh.instanceColor.needsUpdate = true;
+}
+
+window.toggleVertexVal = toggleVertexVal;
+
+const raycaster = new THREE.Raycaster;
+const mouse = new THREE.Vector2;
+
+function setMouse(event) {
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+}
+
+const selectMouseDown = function(event) {
+	setMouse(event);
+	if(event.button == 2){
+		raycaster.setFromCamera(mouse, camera);
+		const inter = raycaster.intersectObject(gridRenderer.vertices.mesh)[0];
+		console.log(inter);
+		if(inter) {
+			let viid = inter.instanceId;
+			let vd = gridRenderer.vertices.mesh.vd[viid];
+			toggleVertexVal(vd);
+		}
+	}
+}
+window.addEventListener( 'pointerdown', selectMouseDown );
+
+const graph = new Graph;
+graph.createEmbedding(graph.vertex);
+const gPos = graph.addAttribute(graph.vertex, "position");
+
+function evaluate() {
+	grid.foreach(grid.face, fd => {
+		if(!grid.isBoundary(fd)){
+			let inversion = 0;
+			grid.foreachIncident(grid.vertex, grid.face, fd, vd => {
+				if(vertexValue[grid.cell(grid.vertex, vd)] > 0)
+					++inversion; 
+			});
+			if(inversion != 0 && inversion != 4){
+				const gv = graph.addVertex();
+				const pos = new THREE.Vector3;
+				grid.foreachIncident(grid.vertex, grid.face, fd, vd => {
+					pos.add(vertexPos[grid.cell(grid.vertex, vd)]);
+				});
+				pos.divideScalar(4);
+				gPos[graph.cell(graph.vertex, gv)] = pos;
+			}
+		}
+	});
+
+	const graphRenderer = new Renderer(graph);
+	graphRenderer.vertices.create()
+	graphRenderer.vertices.addTo(scene)
+}
+window.evaluate = evaluate;
 
 function update ()
 {
