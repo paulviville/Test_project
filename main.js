@@ -2,6 +2,8 @@ import {CMap1, CMap2, Graph} from './CMapJS/CMap/CMap.js';
 import Renderer from './CMapJS/Rendering/Renderer.js';
 import * as THREE from './CMapJS/Libs/three.module.js';
 import { OrbitControls } from './CMapJS/Libs/OrbitsControls.js';
+import Grid2D from './Grid2D.js';
+import Grid3D from './Grid3D.js';
 
 
 
@@ -30,107 +32,27 @@ let pointLight0 = new THREE.PointLight(0x3137DD, 5);
 pointLight0.position.set(10,8,5);
 scene.add(pointLight0);
 
-
-
-function Grid2D (params = {}) {
-	let { xmin = -1, xmax = 1, 
-		ymin = -1, ymax = 1,
-		xdivs = 10,	ydivs = 10 } = params;
-
-	CMap2.call(this);
-
-	const grid = new Array(xdivs * ydivs);
-
-	this.getCell = function (i, j) {
-		return grid[i + j * xdivs];
-	};
-
-	this.getVertex = function (i, j, v) {
-		let vd;
-		const d = this.getCell(i, j);
-		switch(v) {
-			case 1:
-				vd = this.phi1[d];
-				break;
-			case 2:
-				vd = this.phi1[this.phi1[d]];
-				break;
-			case 3:
-				vd = this.phi_1[d];
-				break;
-			default:
-				vd = d;
-		}
-		return vd
-	};
-
-	this.getEdge = this.getVertex;
-
-	this.initGrid = function () {
-		const xstep = (xmax - xmin) / xdivs;
-		const ystep = (ymax - ymin) / ydivs;
-
-		for(let i = 0; i < ydivs; ++i) {
-			for(let j = 0; j < xdivs; ++j) {
-				const fd00 = this.addFace1(4);
-				grid[j + i * xdivs] = fd00;
-				if(j > 0) {
-					const ed00 = this.getEdge(j, i, 3);
-					const ed10 = this.getEdge(j - 1, i, 1);
-					this.sewPhi2(ed00, ed10);
-				}
-				if(i > 0) {
-					const ed00 = this.getEdge(j, i, 0);
-					const ed10 = this.getEdge(j, i - 1, 2);
-					this.sewPhi2(ed00, ed10);
-				}
-			}
-		}
-
-		this.close(true);
-		this.setEmbeddings(this.vertex);
-		const position = this.addAttribute(this.vertex, "position");
-
-		let vd = this.getVertex(0, 0, 0);
-		position[this.cell(this.vertex, vd)] = new THREE.Vector3(xmin, ymin, 0);
-
-		for(let j = 0; j < xdivs; ++j) {
-			const pos1 = new THREE.Vector3(xmin + xstep * (j + 1), ymin, 0);
-			position[this.cell(this.vertex, this.getVertex(j, 0, 1))] = pos1;
-		}
-
-		for(let i = 0; i < ydivs; ++i) {
-			position[this.cell(this.vertex, this.getVertex(0, i, 3))] = new THREE.Vector3(xmin, ymin + ystep * (i+1), 0);
-			for(let j = 0; j < xdivs; ++j) {
-				const pos2 = new THREE.Vector3(xmin + xstep * (j+1), ymin + xstep * (i+1), 0);
-				position[this.cell(this.vertex, this.getVertex(j, i, 2))] = pos2;
-			}
-		}
-	}
-
-	this.initGrid();
-
-	return this;
-}
-
-window.Grid2D = Grid2D;
+let grid3d = new Grid3D;
+window.grid3d = grid3d;
 
 let grid = new Grid2D;
 
 const vertexValue = grid.addAttribute(grid.vertex, "value");
 const vertexPos = grid.getAttribute(grid.vertex, "position");
 
-const radius = 0.5;
+const radius = 0.85;
 function circleVal(pos) {
 	return pos.x * pos.x + pos.y * pos.y - radius * radius;
 }
 
 grid.foreach(grid.vertex, vd => {
 	let vpos = vertexPos[grid.cell(grid.vertex, vd)];
-	// vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
-	vertexValue[grid.cell(grid.vertex, vd)] = -1;
+	vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
+	// vertexValue[grid.cell(grid.vertex, vd)] = -1;
 	// vertexValue[grid.cell(grid.vertex, vd)] = Math.pow(-1, ((vpos.x * vpos.y) > 0 ));
 });
+
+
 
 
 let gridRenderer = new Renderer(grid);
