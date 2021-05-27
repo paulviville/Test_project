@@ -13,7 +13,8 @@ export default function Grid3D (params = {}) {
 
 	const grid = new Array(xdivs * ydivs * zdivs);
 
-	const hash = (i, j, k) => {i + (j + k * zdivs) * ydivs}
+	const hash = (i, j, k) =>  {return i + (j + k * zdivs) * ydivs};
+
 	this.getCell = function (i, j, k) {
 		return grid[hash(i, j, k)];
 	};
@@ -45,7 +46,6 @@ export default function Grid3D (params = {}) {
 				if(i > 0) {
 					let fd1 = cellFaces[this.cell(this.volume, this.getCell(i - 1, j, k))][1];
 					const fd3 = faces[3];
-					// console.log(fd1);
 					let d3 = fd3
 					do {
 						d3 = this.phi1[d3];
@@ -64,7 +64,7 @@ export default function Grid3D (params = {}) {
 					} while(d0 != fd0);
 				}
 				if(k > 0) {
-					let fd5 = cellFaces[this.cell(this.volume, this.getCell(i, j - 1, k))][5];
+					let fd5 = cellFaces[this.cell(this.volume, this.getCell(i, j, k - 1))][5];
 					const fd4 = faces[4];
 					let d4 = fd4
 					do {
@@ -78,5 +78,4 @@ export default function Grid3D (params = {}) {
 	}
 	this.close();
 	this.debug();
-	this.foreach(this.volume, wd => console.log(this.cell(this.volume, wd)));
 };
