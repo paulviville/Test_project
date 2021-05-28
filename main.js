@@ -35,7 +35,7 @@ scene.add(pointLight0);
 let grid3d = new Grid3D;
 window.grid3d = grid3d;
 
-let grid = new Grid2D;
+let grid = new Grid3D;
 
 const vertexValue = grid.addAttribute(grid.vertex, "value");
 const vertexPos = grid.getAttribute(grid.vertex, "position");
@@ -56,9 +56,9 @@ grid.foreach(grid.vertex, vd => {
 
 
 let gridRenderer = new Renderer(grid);
-gridRenderer.vertices.create({size: 0.025});
+gridRenderer.vertices.create({size: 0.0125});
 gridRenderer.vertices.addTo(scene);
-gridRenderer.edges.create({size: 2});
+gridRenderer.edges.create({size: 1});
 gridRenderer.edges.addTo(scene);
 
 const vertexPosColor = new THREE.Color(0x00FF00);

@@ -7,7 +7,7 @@ export default function Grid3D (params = {}) {
 	let { xmin = -1, xmax = 1, 
 		ymin = -1, ymax = 1,
 		zmin = -1, zmax = 1,
-		xdivs = 2,	ydivs = 2, zdivs = 2 } = params;
+		xdivs = 5,	ydivs = 5, zdivs = 5 } = params;
 
 	CMap3.call(this);
 
@@ -25,9 +25,21 @@ export default function Grid3D (params = {}) {
 	const cellFaces = this.addAttribute(this.volume, "cellFaces");
 	
 	this.getFace = function(i, j, k, f) {
-
+		return cellFaces[this.cell(this.volume, this.getCell(i, j, k))][f];
 	};
 
+	this.getEdge = function(i, j, k, e) {
+		return cellEdges[this.cell(this.volume, this.getCell(i, j, k))][e];
+	};
+
+	this.getVertex = function(i, j, k, v) {
+		return cellVertices[this.cell(this.volume, this.getCell(i, j, k))][v];
+	};
+
+	const xstep = (xmax - xmin) / xdivs;
+	const ystep = (ymax - ymin) / ydivs;
+	const zstep = (zmax - zmin) / zdivs;
+	
 	for(let k = 0; k < zdivs; ++k) {
 		for(let j = 0; j < ydivs; ++j) {
 			for(let i = 0; i < xdivs; ++i) {
@@ -43,8 +55,22 @@ export default function Grid3D (params = {}) {
 				faces[5] = this.phi([1, 1, 2], faces[0]);
 				cellFaces[wid] = faces;
 
+				const edges = [wd];
+
+				cellEdges[wid] = edges;
+
+				const vertices = [wd];
+				vertices[1] = this.phi1[vertices[0]];
+				vertices[2] = this.phi([2, 1, 1, 2], vertices[0]);
+				vertices[3] = this.phi1[vertices[2]];
+				vertices[4] = this.phi_1[vertices[0]];
+				vertices[5] = this.phi1[vertices[1]];
+				vertices[6] = this.phi_1[vertices[2]];
+				vertices[7] = this.phi1[vertices[3]];
+				cellVertices[wid] = vertices;
+
 				if(i > 0) {
-					let fd1 = cellFaces[this.cell(this.volume, this.getCell(i - 1, j, k))][1];
+					let fd1 = this.getFace(i - 1, j, k, 1);
 					const fd3 = faces[3];
 					let d3 = fd3
 					do {
@@ -54,7 +80,7 @@ export default function Grid3D (params = {}) {
 					} while(d3 != fd3);
 				}
 				if(j > 0) {
-					let fd2 = cellFaces[this.cell(this.volume, this.getCell(i, j - 1, k))][2];
+					let fd2 = this.getFace(i, j - 1, k, 2);
 					const fd0 = faces[0];
 					let d0 = fd0
 					do {
@@ -64,7 +90,7 @@ export default function Grid3D (params = {}) {
 					} while(d0 != fd0);
 				}
 				if(k > 0) {
-					let fd5 = cellFaces[this.cell(this.volume, this.getCell(i, j, k - 1))][5];
+					let fd5 = this.getFace(i, j, k - 1, 5);;
 					const fd4 = faces[4];
 					let d4 = fd4
 					do {
@@ -77,5 +103,45 @@ export default function Grid3D (params = {}) {
 		}	
 	}
 	this.close();
+	this.setEmbeddings(this.vertex);
+	const position = this.addAttribute(this.vertex, "position");
 	this.debug();
+
+	this.foreach(this.vertex, vd => {
+		position[this.cell(this.vertex, vd)] = new THREE.Vector3;
+	});
+
+	let vd = this.getVertex(0, 0, 0, 0);
+	position[this.cell(this.vertex, vd)] = new THREE.Vector3(xmin, ymin, zmin);
+
+	for(let i = 0; i < xdivs; ++i) {
+		const pos1 = new THREE.Vector3(xmin + xstep * (i + 1), ymin, zmin);
+		position[this.cell(this.vertex, this.getVertex(i, 0, 0, 1))] = pos1;
+	}
+
+	for(let j = 0; j < ydivs; ++j) {
+		position[this.cell(this.vertex, this.getVertex(0, j, 0, 3))] = new THREE.Vector3(xmin, ymin + ystep * (j + 1), zmin);
+		for(let i = 0; i < xdivs; ++i) {
+			const pos2 = new THREE.Vector3(xmin + xstep * (i + 1), ymin + ystep * (j + 1), zmin);
+			position[this.cell(this.vertex, this.getVertex(i, j, 0, 2))] = pos2;
+		}
+	}
+
+	for(let k = 0; k < zdivs; ++k) {
+		let vd = this.getVertex(0, 0, k, 4);
+		position[this.cell(this.vertex, vd)] = new THREE.Vector3(xmin, ymin, zmin + (k + 1) * zstep);
+
+		for(let i = 0; i < xdivs; ++i) {
+			const pos1 = new THREE.Vector3(xmin + xstep * (i + 1), ymin, zmin + (k + 1) * zstep);
+			position[this.cell(this.vertex, this.getVertex(i, 0, k, 5))] = pos1;
+		}
+
+		for(let j = 0; j < ydivs; ++j) {
+			position[this.cell(this.vertex, this.getVertex(0, j, k, 7))] = new THREE.Vector3(xmin, ymin + ystep * (j + 1), zmin + (k + 1) * zstep);
+			for(let i = 0; i < xdivs; ++i) {
+				const pos2 = new THREE.Vector3(xmin + xstep * (i + 1), ymin + ystep * (j + 1), zmin + (k + 1) * zstep);
+				position[this.cell(this.vertex, this.getVertex(i, j, k, 6))] = pos2;
+			}
+		}
+	}
 };
