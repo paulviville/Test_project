@@ -11,8 +11,10 @@ export default function Grid2D (params = {}) {
 
 	const grid = new Array(xdivs * ydivs);
 
+	const hash = (i, j) =>  {return i + j * ydivs};
+
 	this.getCell = function (i, j) {
-		return grid[i + j * xdivs];
+		return grid[hash(i, j)];
 	};
 
 	this.getVertex = function (i, j, v) {
@@ -40,18 +42,20 @@ export default function Grid2D (params = {}) {
 		const xstep = (xmax - xmin) / xdivs;
 		const ystep = (ymax - ymin) / ydivs;
 
-		for(let i = 0; i < ydivs; ++i) {
-			for(let j = 0; j < xdivs; ++j) {
+		const cellVertices = this.addAttribute(this.face, "cellVertices");
+
+		for(let j = 0; j < ydivs; ++j) {
+			for(let i = 0; i < xdivs; ++i) {
 				const fd00 = this.addFace1(4);
-				grid[j + i * xdivs] = fd00;
-				if(j > 0) {
-					const ed00 = this.getEdge(j, i, 3);
-					const ed10 = this.getEdge(j - 1, i, 1);
+				grid[hash(i, j)] = fd00;
+				if(i > 0) {
+					const ed00 = this.getEdge(i, j, 3);
+					const ed10 = this.getEdge(i - 1, j, 1);
 					this.sewPhi2(ed00, ed10);
 				}
-				if(i > 0) {
-					const ed00 = this.getEdge(j, i, 0);
-					const ed10 = this.getEdge(j, i - 1, 2);
+				if(j > 0) {
+					const ed00 = this.getEdge(i, j, 0);
+					const ed10 = this.getEdge(i, j - 1, 2);
 					this.sewPhi2(ed00, ed10);
 				}
 			}
