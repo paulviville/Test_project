@@ -5,38 +5,32 @@ import * as THREE from './CMapJS/Libs/three.module.js';
 export default function Grid2D (params = {}) {
 	let { xmin = -1, xmax = 1, 
 		ymin = -1, ymax = 1,
-		xdivs = 10,	ydivs = 10 } = params;
+		xdivs = 20,	ydivs = 20 } = params;
 
 	CMap2.call(this);
 
 	const grid = new Array(xdivs * ydivs);
+	this.createEmbedding(this.face);
+	const cellVertices = this.addAttribute(this.face, "cellVertices");
+
+	const hash = (i, j) =>  {return i + j * ydivs};
 
 	this.getCell = function (i, j) {
-		return grid[i + j * xdivs];
+		return grid[hash(i, j)];
 	};
 
 	this.getVertex = function (i, j, v) {
-		let vd;
-		const d = this.getCell(i, j);
-		switch(v) {
-			case 1:
-				vd = this.phi1[d];
-				break;
-			case 2:
-				vd = this.phi1[this.phi1[d]];
-				break;
-			case 3:
-				vd = this.phi_1[d];
-				break;
-			default:
-				vd = d;
-		}
-		return vd
+		return this.cellVertex(this.getCell(i, j), v);
+	};
+
+	this.cellVertex = function(fd, v) {
+		return cellVertices[this.cell(this.face, fd)][v];
 	};
 
 	this.getEdge = this.getVertex;
+	this.cellEdge = this.cellVertex;
 
-	this.initGrid = function () {
+	(() => {
 		const xstep = (xmax - xmin) / xdivs;
 		const ystep = (ymax - ymin) / ydivs;
 
@@ -44,6 +38,13 @@ export default function Grid2D (params = {}) {
 			for(let i = 0; i < xdivs; ++i) {
 				const fd00 = this.addFace1(4);
 				grid[i + j * xdivs] = fd00;
+
+				const vertices = [fd00];
+				vertices[1] = this.phi1[fd00];
+				vertices[2] = this.phi1[vertices[1]];
+				vertices[3] = this.phi_1[fd00];
+				cellVertices[this.cell(this.face, fd00)] = vertices;
+
 				if(i > 0) {
 					const ed00 = this.getEdge(i, j, 3);
 					const ed10 = this.getEdge(i - 1, j, 1);
@@ -76,9 +77,7 @@ export default function Grid2D (params = {}) {
 				position[this.cell(this.vertex, this.getVertex(i, j, 2))] = pos2;
 			}
 		}
-	}
-
-	this.initGrid();
+	})();
 
 	return this;
 }
