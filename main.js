@@ -32,22 +32,45 @@ let pointLight0 = new THREE.PointLight(0x3137DD, 5);
 pointLight0.position.set(10,8,5);
 scene.add(pointLight0);
 
-let grid3d = new Grid3D;
+let grid3d = new Grid2D;
 window.grid3d = grid3d;
 
-let grid = new Grid2D;
+let grid = new Grid3D;
 
 const vertexValue = grid.addAttribute(grid.vertex, "value");
 const vertexPos = grid.getAttribute(grid.vertex, "position");
+
+const aRadius = 0.7;
+const bRadius = 0.07;
+function torusVal(pos) {
+	return Math.pow(
+		Math.pow(pos.x*pos.x+pos.y*pos.y, 2)
+			+pos.x*(pos.x*pos.x-3*pos.y*pos.y),2) + pos.z * pos.z - 0.08;
+	// return (Math.sqrt(pos.x*pos.x + pos.y*pos.y ))
+}
+
+let pow = Math.pow;
+
+function tangleVal(pos) {
+	pos = pos.clone().multiplyScalar(2);
+	return pow(pos.x, 4) - 5*pow(pos.x, 2) + pow(pos.y, 4) - 5*pow(pos.y, 2)
+	 + pow(pos.z, 4) - 5*pow(pos.z, 2) + 11.8;
+}
+/// http://www-sop.inria.fr/galaad/surface/
 
 const radius = 0.85;
 function circleVal(pos) {
 	return pos.x * pos.x + pos.y * pos.y - radius * radius;
 }
 
+function sphereVal(pos) {
+	return pos.x * pos.x + pos.y * pos.y + pos.z * pos.z - radius * radius;
+}
+
 grid.foreach(grid.vertex, vd => {
 	let vpos = vertexPos[grid.cell(grid.vertex, vd)];
-	vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
+	vertexValue[grid.cell(grid.vertex, vd)] = tangleVal(vpos);
+	// vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
 	// vertexValue[grid.cell(grid.vertex, vd)] = -1;
 	// vertexValue[grid.cell(grid.vertex, vd)] = Math.pow(-1, ((vpos.x * vpos.y) > 0 ));
 });
@@ -56,9 +79,9 @@ grid.foreach(grid.vertex, vd => {
 
 
 let gridRenderer = new Renderer(grid);
-gridRenderer.vertices.create({size: 0.025});
+gridRenderer.vertices.create({size: 0.00625});
 gridRenderer.vertices.addTo(scene);
-gridRenderer.edges.create({size: 2});
+gridRenderer.edges.create({size: 0.75});
 gridRenderer.edges.addTo(scene);
 
 const vertexPosColor = new THREE.Color(0x00FF00);
@@ -132,10 +155,35 @@ function evaluate() {
 	});
 
 	const graphRenderer = new Renderer(graph);
-	graphRenderer.vertices.create()
+	graphRenderer.vertices.create({size: 0.05, color: new THREE.Color(0x0000FF)})
+	graphRenderer.vertices.addTo(scene)
+}
+function evaluate3() {
+	grid.foreach(grid.volume, wd => {
+		if(!grid.isBoundary(wd)){
+			let inversion = 0;
+			grid.foreachIncident(grid.vertex, grid.volume, wd, vd => {
+				if(vertexValue[grid.cell(grid.vertex, vd)] > 0)
+					++inversion; 
+			});
+			if(inversion != 0 && inversion != 8){
+				const gv = graph.addVertex();
+				const pos = new THREE.Vector3;
+				grid.foreachIncident(grid.vertex, grid.volume, wd, vd => {
+					pos.add(vertexPos[grid.cell(grid.vertex, vd)]);
+				});
+				pos.divideScalar(8);
+				gPos[graph.cell(graph.vertex, gv)] = pos;
+			}
+		}
+	});
+
+	const graphRenderer = new Renderer(graph);
+	graphRenderer.vertices.create({size: 0.05, color: new THREE.Color(0x0000FF)})
 	graphRenderer.vertices.addTo(scene)
 }
 window.evaluate = evaluate;
+window.evaluate3 = evaluate3;
 
 function update ()
 {

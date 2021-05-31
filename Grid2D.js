@@ -5,11 +5,15 @@ import * as THREE from './CMapJS/Libs/three.module.js';
 export default function Grid2D (params = {}) {
 	let { xmin = -1, xmax = 1, 
 		ymin = -1, ymax = 1,
-		xdivs = 10,	ydivs = 10 } = params;
+		xdivs = 20,	ydivs = 20 } = params;
 
 	CMap2.call(this);
 
 	const grid = new Array(xdivs * ydivs);
+	this.createEmbedding(this.face);
+	const cellVertices = this.addAttribute(this.face, "cellVertices");
+
+	const hash = (i, j) =>  {return i + j * ydivs};
 
 	const hash = (i, j) =>  {return i + j * ydivs};
 
@@ -18,27 +22,17 @@ export default function Grid2D (params = {}) {
 	};
 
 	this.getVertex = function (i, j, v) {
-		let vd;
-		const d = this.getCell(i, j);
-		switch(v) {
-			case 1:
-				vd = this.phi1[d];
-				break;
-			case 2:
-				vd = this.phi1[this.phi1[d]];
-				break;
-			case 3:
-				vd = this.phi_1[d];
-				break;
-			default:
-				vd = d;
-		}
-		return vd
+		return this.cellVertex(this.getCell(i, j), v);
+	};
+
+	this.cellVertex = function(fd, v) {
+		return cellVertices[this.cell(this.face, fd)][v];
 	};
 
 	this.getEdge = this.getVertex;
+	this.cellEdge = this.cellVertex;
 
-	this.initGrid = function () {
+	(() => {
 		const xstep = (xmax - xmin) / xdivs;
 		const ystep = (ymax - ymin) / ydivs;
 
@@ -68,21 +62,19 @@ export default function Grid2D (params = {}) {
 		let vd = this.getVertex(0, 0, 0);
 		position[this.cell(this.vertex, vd)] = new THREE.Vector3(xmin, ymin, 0);
 
-		for(let j = 0; j < xdivs; ++j) {
-			const pos1 = new THREE.Vector3(xmin + xstep * (j + 1), ymin, 0);
-			position[this.cell(this.vertex, this.getVertex(j, 0, 1))] = pos1;
+		for(let i = 0; i < xdivs; ++i) {
+			const pos1 = new THREE.Vector3(xmin + xstep * (i + 1), ymin, 0);
+			position[this.cell(this.vertex, this.getVertex(i, 0, 1))] = pos1;
 		}
 
-		for(let i = 0; i < ydivs; ++i) {
-			position[this.cell(this.vertex, this.getVertex(0, i, 3))] = new THREE.Vector3(xmin, ymin + ystep * (i+1), 0);
-			for(let j = 0; j < xdivs; ++j) {
-				const pos2 = new THREE.Vector3(xmin + xstep * (j+1), ymin + xstep * (i+1), 0);
-				position[this.cell(this.vertex, this.getVertex(j, i, 2))] = pos2;
+		for(let j = 0; j < ydivs; ++j) {
+			position[this.cell(this.vertex, this.getVertex(0, j, 3))] = new THREE.Vector3(xmin, ymin + ystep * (j+1), 0);
+			for(let i = 0; i < xdivs; ++i) {
+				const pos2 = new THREE.Vector3(xmin + xstep * (i + 1), ymin + xstep * (j + 1), 0);
+				position[this.cell(this.vertex, this.getVertex(i, j, 2))] = pos2;
 			}
 		}
-	}
-
-	this.initGrid();
+	})();
 
 	return this;
 }
