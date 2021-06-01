@@ -35,7 +35,7 @@ scene.add(pointLight0);
 let grid3d = new Grid2D;
 window.grid3d = grid3d;
 
-let grid = new Grid3D;
+let grid = new Grid2D;
 
 const vertexValue = grid.addAttribute(grid.vertex, "value");
 const vertexPos = grid.getAttribute(grid.vertex, "position");
@@ -79,7 +79,7 @@ grid.foreach(grid.vertex, vd => {
 
 
 let gridRenderer = new Renderer(grid);
-gridRenderer.vertices.create({size: 0.00625});
+gridRenderer.vertices.create({size: 0.00625, color: new THREE.Color(0xFFFF00)});
 gridRenderer.vertices.addTo(scene);
 gridRenderer.edges.create({size: 0.75});
 gridRenderer.edges.addTo(scene);
@@ -179,11 +179,42 @@ function evaluate3() {
 	});
 
 	const graphRenderer = new Renderer(graph);
-	graphRenderer.vertices.create({size: 0.05, color: new THREE.Color(0x0000FF)})
+	graphRenderer.vertices.create({size: 0.5, color: new THREE.Color(0x0000FF)})
 	graphRenderer.vertices.addTo(scene)
 }
 window.evaluate = evaluate;
 window.evaluate3 = evaluate3;
+
+const MSLookUpTable = {
+	0: [],
+	1: [0, 3],
+	2: [1, 0],
+	3: [1, 3],
+	4: [2, 1],
+	5: [0, 1, 2, 3],
+	6: [2, 0],
+	7: [2, 3],
+	8: [3, 2],
+	9: [0, 2],
+	10: [3, 0, 1, 2],
+	11: [1, 2],
+	12: [3, 1],
+	13: [0, 1],
+	14: [3, 0],
+	15: []
+}
+
+function marchingSquare(grid) {
+
+
+
+	const graphRenderer = new Renderer(graph);
+	graphRenderer.vertices.create({size: 0.5, color: new THREE.Color(0x0000FF)})
+	graphRenderer.vertices.create({size: 0.5})
+	graphRenderer.vertices.addTo(scene)
+	graphRenderer.edges.addTo(scene)
+}
+window.marchingSquare = marchingSquare;
 
 function update ()
 {
