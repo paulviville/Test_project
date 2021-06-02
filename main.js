@@ -5,7 +5,8 @@ import { OrbitControls } from './CMapJS/Libs/OrbitsControls.js';
 import Grid2D from './Grid2D.js';
 import Grid3D from './Grid3D.js';
 import {MCLookUpTable} from './MCLookup.js';
-
+import { exportCmap2, loadCMap2 } from './CMapJS/IO/Surface_Formats/CMap2IO.js';
+import { octahedron_off, tetrahedron_off} from './off_files.js'
 
 
 const scene = new THREE.Scene();
@@ -53,15 +54,30 @@ function torusVal(pos) {
 	return (pow(aRadius - sqrt(pos.x*pos.x + pos.y*pos.y), 2) + pow(pos.z, 2) - bRadius * bRadius)
 }
 
+// function gumdropVal(pos) {
+	// pos = pos.clone().multiplyScalar(2);
+	// return 4 * pow(pos.x, 4) + 4 * pow(pos.y, 4) + 8 * pow(pos.y,2)
+	// * pow(pos.z, 2) + 4 * pow(pos.z, 4) + 17 * pow(pos.x, 2) 
+	// * pow(pos.y, 2) + 17 * pow(pos.x, 2) * pow(pos.z, 2) - 20 
+	// * pow(pos.x, 2) - 20 * pow(pos.y, 2) - 20 * pow(pos.z, 2) + 17;
+// }
+
+const gumdropVal = new Function("pos", 
+`pos = pos.clone().multiplyScalar(2);
+return 4 * Math.pow(pos.x, 4) + 4 * Math.pow(pos.y, 4) + 8 * Math.pow(pos.y,2)
+* Math.pow(pos.z, 2) + 4 * Math.pow(pos.z, 4) + 17 * Math.pow(pos.x, 2) 
+* Math.pow(pos.y, 2) + 17 * Math.pow(pos.x, 2) * Math.pow(pos.z, 2) - 20 
+* Math.pow(pos.x, 2) - 20 * Math.pow(pos.y, 2) - 20 * Math.pow(pos.z, 2) + 17;`
+);
 
 function tangleVal(pos) {
 	pos = pos.clone().multiplyScalar(2);
-	return pow(pos.x, 4) - 5*pow(pos.x, 2) + pow(pos.y, 4) - 5*pow(pos.y, 2)
-	 + pow(pos.z, 4) - 5*pow(pos.z, 2) + 11.8;
+	return (pow(pos.x, 4) - 5*pow(pos.x, 2) + pow(pos.y, 4) - 5*pow(pos.y, 2)
+	 + pow(pos.z, 4) - 5*pow(pos.z, 2) + 11.8);
 }
 /// http://www-sop.inria.fr/galaad/surface/
 
-const radius = 0.85;
+const radius = 0.5;
 function circleVal(pos) {
 	return pos.x * pos.x + pos.y * pos.y - radius * radius;
 }
@@ -72,8 +88,8 @@ function sphereVal(pos) {
 
 grid.foreach(grid.vertex, vd => {
 	let vpos = vertexPos[grid.cell(grid.vertex, vd)];
-	vertexValue[grid.cell(grid.vertex, vd)] = tangleVal(vpos);
-	// vertexValue[grid.cell(grid.vertex, vd)] = circleVal(vpos);
+	// vertexValue[grid.cell(grid.vertex, vd)] = tangleVal(vpos)*sphereVal(vpos);
+	vertexValue[grid.cell(grid.vertex, vd)] = gumdropVal(vpos);
 	// vertexValue[grid.cell(grid.vertex, vd)] = -1;
 	// vertexValue[grid.cell(grid.vertex, vd)] = Math.pow(-1, ((vpos.x * vpos.y) > 0 ));
 });
@@ -123,7 +139,6 @@ const selectMouseDown = function(event) {
 	if(event.button == 2){
 		raycaster.setFromCamera(mouse, camera);
 		const inter = raycaster.intersectObject(gridRenderer.vertices.mesh)[0];
-		console.log(inter);
 		if(inter) {
 			let viid = inter.instanceId;
 			let vd = gridRenderer.vertices.mesh.vd[viid];
@@ -332,6 +347,8 @@ function marchingCube(grid) {
 	const edgeVertex = grid.addAttribute(edge, "edgeVertex");
 	
 	const cmap = new CMap2;
+	const position = cmap.addAttribute(cmap.vertex, "position");
+	const dartPerVertex = cmap.addAttribute(cmap.vertex, "dartPerVertex");
 
 	grid.foreach(edge, ed => {
 		let signChange = 0;
@@ -349,12 +366,16 @@ function marchingCube(grid) {
 			// const pos = vertexPos[grid.cell(vertex, ed)].clone();
 			// pos.addScaledVector(vertexPos[grid.cell(vertex, grid.phi2[ed])], 1);
 			// pos.divideScalar(2);
+			
+			let vid = cmap.newCell(cmap.vertex);
+			edgeVertex[grid.cell(edge, ed)] = vid;
 
-			let gv = graph.addVertex();
-			edgeVertex[grid.cell(edge, ed)] = gv;
-			gPos[graph.cell(graph.vertex, gv)] = pos;
+			position[vid] = pos;
+			dartPerVertex[vid] = [];
 		}
 	});
+
+	cmap.createEmbedding(cmap.vertex);
 
 	grid.foreach(volume, wd => {
 		if(grid.isBoundary(wd))
@@ -368,24 +389,47 @@ function marchingCube(grid) {
 		}
 		const edges = MCLookUpTable[caseId];
 		for(let i = 0; i < edges.length; i += 3) {
-			const v0 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i])))];
-			const v1 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i + 1])))];
-			const v2 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i + 2])))];
-			graph.connectVertices(v0, v1);
-			graph.connectVertices(v0, v2);
-			graph.connectVertices(v1, v2);
+			const vid0 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i])))];
+			const vid1 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i + 1])))];
+			const vid2 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i + 2])))];
+			
+			const fd = cmap.addFace(3, false);
+
+			cmap.setEmbedding(cmap.vertex, fd, vid0);
+			cmap.setEmbedding(cmap.vertex, cmap.phi1[fd], vid1);
+			cmap.setEmbedding(cmap.vertex, cmap.phi_1[fd], vid2);
+
+			dartPerVertex[vid0].push(fd);
+			dartPerVertex[vid1].push(cmap.phi1[fd]);
+			dartPerVertex[vid2].push(cmap.phi_1[fd]);
 		}
 	});
-	edgeVertex.delete();
 
-	const graphRenderer = new Renderer(graph);
+	let v0;
+	cmap.foreachDart(d0 => {
+		v0 = cmap.cell(cmap.vertex, d0);
+		dartPerVertex[cmap.cell(cmap.vertex, cmap.phi1[d0])].forEach(d1 => {
+			if(cmap.cell(cmap.vertex, cmap.phi1[d1]) == v0){
+				cmap.sewPhi2(d0, d1);
+			}
+		});
+	});
+
+	edgeVertex.delete();
+	cmap.close();
+
+	const graphRenderer = new Renderer(cmap);
 	graphRenderer.vertices.create({size: 0.0125, color: new THREE.Color(0x0000FF)})
-	graphRenderer.edges.create({size: 0.5})
-	graphRenderer.vertices.addTo(scene)
+	graphRenderer.edges.create({size: 0.25})
+	// graphRenderer.vertices.addTo(scene)
 	graphRenderer.edges.addTo(scene)
+	graphRenderer.faces.create()
+	gridRenderer.vertices.remove();
+graphRenderer.faces.addTo(scene) 
 }
 window.marchingCube = marchingCube;
 
+// let rendererr= new Renderer(loadCMap2("off", octahedron_off)).faces.create().addTo(scene);
 
 function update ()
 {

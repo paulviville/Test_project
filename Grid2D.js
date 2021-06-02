@@ -24,8 +24,6 @@ export default function Grid2D (params = {}) {
 
 	const hash = (i, j) =>  {return i + j * ydivs};
 
-	const hash = (i, j) =>  {return i + j * ydivs};
-
 	this.getCell = function (i, j) {
 		return grid[hash(i, j)];
 	};
