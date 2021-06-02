@@ -1,6 +1,15 @@
 import { CMap2 } from './CMapJS/CMap/CMap.js';
-// import { Vector3 } from './CMapJS/Libs/three.module.js';
 import * as THREE from './CMapJS/Libs/three.module.js';
+
+/// grid cell :
+///		vertices		edges
+///		3 ------ 2		--- 2 ---
+///     |        |		|		|
+///		|	     |		3		1
+///		|	     |		|		|
+///		0 ------ 1		--- 0 --- 
+
+
 
 export default function Grid2D (params = {}) {
 	let { xmin = -1, xmax = 1, 

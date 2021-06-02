@@ -4,7 +4,7 @@ import * as THREE from './CMapJS/Libs/three.module.js';
 import { OrbitControls } from './CMapJS/Libs/OrbitsControls.js';
 import Grid2D from './Grid2D.js';
 import Grid3D from './Grid3D.js';
-
+import {MCLookUpTable} from './MCLookup.js';
 
 
 
@@ -32,24 +32,27 @@ let pointLight0 = new THREE.PointLight(0x3137DD, 5);
 pointLight0.position.set(10,8,5);
 scene.add(pointLight0);
 
-let grid3d = new Grid2D;
-window.grid3d = grid3d;
+// let grid3d = new Grid2D;
+// window.grid3d = grid3d;
 
-let grid = new Grid2D;
+let grid = new Grid3D;
+window.grid = grid;
 
 const vertexValue = grid.addAttribute(grid.vertex, "value");
 const vertexPos = grid.getAttribute(grid.vertex, "position");
 
-const aRadius = 0.7;
-const bRadius = 0.07;
+const bRadius = 0.3;
+const aRadius = 0.65;
+let pow = Math.pow;
+let sqrt = Math.sqrt;
 function torusVal(pos) {
-	return Math.pow(
-		Math.pow(pos.x*pos.x+pos.y*pos.y, 2)
-			+pos.x*(pos.x*pos.x-3*pos.y*pos.y),2) + pos.z * pos.z - 0.08;
-	// return (Math.sqrt(pos.x*pos.x + pos.y*pos.y ))
+
+	// return Math.pow(
+	// 	Math.pow(pos.x*pos.x+pos.y*pos.y, 2)
+	// 		+pos.x*(pos.x*pos.x-3*pos.y*pos.y),2) + pos.z * pos.z - 0.08;
+	return (pow(aRadius - sqrt(pos.x*pos.x + pos.y*pos.y), 2) + pow(pos.z, 2) - bRadius * bRadius)
 }
 
-let pow = Math.pow;
 
 function tangleVal(pos) {
 	pos = pos.clone().multiplyScalar(2);
@@ -82,7 +85,7 @@ let gridRenderer = new Renderer(grid);
 gridRenderer.vertices.create({size: 0.00625, color: new THREE.Color(0xFFFF00)});
 gridRenderer.vertices.addTo(scene);
 gridRenderer.edges.create({size: 0.75});
-gridRenderer.edges.addTo(scene);
+// gridRenderer.edges.addTo(scene);
 
 const vertexPosColor = new THREE.Color(0x00FF00);
 const vertexNegColor = new THREE.Color(0xFF0000);
@@ -205,16 +208,184 @@ const MSLookUpTable = {
 }
 
 function marchingSquare(grid) {
-
+	const vertex = grid.vertex;
+	const edge = grid.edge;
+	const face = grid.face;
+	
+	grid.foreach(edge, ed => {
+		let signChange = 0;
+		grid.foreachIncident(vertex, edge, ed, vd => {
+			signChange += (vertexValue[grid.cell(vertex, vd)] > 0 ? 1 : 0);
+		});
+		if(signChange % 2) {
+			const pos = vertexPos[grid.cell(vertex, ed)].clone();
+			pos.add(vertexPos[grid.cell(vertex, grid.phi2[ed])]);
+			pos.divideScalar(2);
+			let gv = graph.addVertex();
+			gPos[graph.cell(graph.vertex, gv)] = pos;
+		}
+	});
 
 
 	const graphRenderer = new Renderer(graph);
-	graphRenderer.vertices.create({size: 0.5, color: new THREE.Color(0x0000FF)})
-	graphRenderer.vertices.create({size: 0.5})
+	graphRenderer.vertices.create({size: 0.025, color: new THREE.Color(0x0000FF)})
+	graphRenderer.edges.create({size: 0.5})
 	graphRenderer.vertices.addTo(scene)
 	graphRenderer.edges.addTo(scene)
 }
+let abs = Math.abs;
+
+// function marchingSquare(grid) {
+// 	const vertex = grid.vertex;
+// 	const edge = grid.edge;
+// 	const face = grid.face;
+	
+// 	grid.foreach(edge, ed => {
+// 		let signChange = 0;
+// 		grid.foreachIncident(vertex, edge, ed, vd => {
+// 			signChange += (vertexValue[grid.cell(vertex, vd)] > 0 ? 1 : 0);
+// 		});
+
+// 		if(signChange % 2) {
+// 			let a = abs(vertexValue[grid.cell(vertex, ed)])
+// 			let b = abs(vertexValue[grid.cell(vertex, grid.phi2[ed])])
+// 			let ratio = a /(a + b)
+// 			const pos = vertexPos[grid.cell(vertex, ed)].clone().multiplyScalar(b);
+// 			pos.addScaledVector(vertexPos[grid.cell(vertex, grid.phi2[ed])], a);
+// 			pos.divideScalar(a + b);
+
+
+// 			let gv = graph.addVertex();
+// 			gPos[graph.cell(graph.vertex, gv)] = pos;
+// 		}
+// 	});
+
+
+// 	const graphRenderer = new Renderer(graph);
+// 	graphRenderer.vertices.create({size: 0.0125, color: new THREE.Color(0x0000FF)})
+// 	graphRenderer.edges.create({size: 0.5})
+// 	graphRenderer.vertices.addTo(scene)
+// 	graphRenderer.edges.addTo(scene)
+// }
+
+// function marchingSquare(grid) {
+// 	const vertex = grid.vertex;
+// 	const edge = grid.edge;
+// 	const face = grid.face;
+	
+// 	const edgeVertex = grid.addAttribute(edge, "edgeVertex");
+
+// 	grid.foreach(edge, ed => {
+// 		let signChange = 0;
+// 		grid.foreachIncident(vertex, edge, ed, vd => {
+// 			signChange += (vertexValue[grid.cell(vertex, vd)] > 0 ? 1 : 0);
+// 		});
+
+// 		if(signChange % 2) {
+// 			let a = abs(vertexValue[grid.cell(vertex, ed)])
+// 			let b = abs(vertexValue[grid.cell(vertex, grid.phi2[ed])])
+// 			const pos = vertexPos[grid.cell(vertex, ed)].clone().multiplyScalar(b);
+// 			pos.addScaledVector(vertexPos[grid.cell(vertex, grid.phi2[ed])], a);
+// 			pos.divideScalar(a + b);
+
+// 			let gv = graph.addVertex();
+// 			edgeVertex[grid.cell(edge, ed)] = gv;
+// 			gPos[graph.cell(graph.vertex, gv)] = pos;
+// 		}
+// 	});
+
+// 	grid.foreach(face, fd => {
+// 		if(grid.isBoundary(fd))
+// 			return;
+// 		let caseId = 0;
+// 		for(let i = 0; i < 4; ++i) {
+// 			const value = vertexValue[grid.cell(vertex, grid.cellVertex(fd, 3 - i))];
+// 			caseId <<= 1;
+// 			caseId |= (value >= 0 ? 1 : 0);
+// 		}
+// 		const edges = MSLookUpTable[caseId];
+// 		for(let i = 0; i < edges.length; i += 2) {
+// 			const v0 = edgeVertex[(grid.cell(edge, grid.cellEdge(fd, edges[i])))];
+// 			const v1 = edgeVertex[(grid.cell(edge, grid.cellEdge(fd, edges[i + 1])))];
+// 			graph.connectVertices(v0, v1);
+// 		}
+// 	});
+// 	edgeVertex.delete();
+
+// 	const graphRenderer = new Renderer(graph);
+// 	graphRenderer.vertices.create({size: 0.0125, color: new THREE.Color(0x0000FF)})
+// 	graphRenderer.edges.create({size: 0.5})
+// 	graphRenderer.vertices.addTo(scene)
+// 	graphRenderer.edges.addTo(scene)
+// }
+
+
 window.marchingSquare = marchingSquare;
+
+
+function marchingCube(grid) {
+	const vertex = grid.vertex;
+	const edge = grid.edge;
+	const face = grid.face;
+	const volume = grid.volume;
+	
+	const edgeVertex = grid.addAttribute(edge, "edgeVertex");
+	
+	const cmap = new CMap2;
+
+	grid.foreach(edge, ed => {
+		let signChange = 0;
+		grid.foreachIncident(vertex, edge, ed, vd => {
+			signChange += (vertexValue[grid.cell(vertex, vd)] > 0 ? 1 : 0);
+		});
+
+		if(signChange % 2) {
+			let a = abs(vertexValue[grid.cell(vertex, ed)])
+			let b = abs(vertexValue[grid.cell(vertex, grid.phi2[ed])])
+			const pos = vertexPos[grid.cell(vertex, ed)].clone().multiplyScalar(b);
+			pos.addScaledVector(vertexPos[grid.cell(vertex, grid.phi2[ed])], a);
+			pos.divideScalar(a + b);
+
+			// const pos = vertexPos[grid.cell(vertex, ed)].clone();
+			// pos.addScaledVector(vertexPos[grid.cell(vertex, grid.phi2[ed])], 1);
+			// pos.divideScalar(2);
+
+			let gv = graph.addVertex();
+			edgeVertex[grid.cell(edge, ed)] = gv;
+			gPos[graph.cell(graph.vertex, gv)] = pos;
+		}
+	});
+
+	grid.foreach(volume, wd => {
+		if(grid.isBoundary(wd))
+			return;
+
+		let caseId = 0;
+		for(let i = 0; i < 8; ++i) {
+			const value = vertexValue[grid.cell(vertex, grid.cellVertex(wd, 7 - i))];
+			caseId <<= 1;
+			caseId |= (value >= 0 ? 1 : 0);
+		}
+		const edges = MCLookUpTable[caseId];
+		for(let i = 0; i < edges.length; i += 3) {
+			const v0 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i])))];
+			const v1 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i + 1])))];
+			const v2 = edgeVertex[(grid.cell(edge, grid.cellEdge(wd, edges[i + 2])))];
+			graph.connectVertices(v0, v1);
+			graph.connectVertices(v0, v2);
+			graph.connectVertices(v1, v2);
+		}
+	});
+	edgeVertex.delete();
+
+	const graphRenderer = new Renderer(graph);
+	graphRenderer.vertices.create({size: 0.0125, color: new THREE.Color(0x0000FF)})
+	graphRenderer.edges.create({size: 0.5})
+	graphRenderer.vertices.addTo(scene)
+	graphRenderer.edges.addTo(scene)
+}
+window.marchingCube = marchingCube;
+
 
 function update ()
 {

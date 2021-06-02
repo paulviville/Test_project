@@ -4,9 +4,9 @@ import * as THREE from './CMapJS/Libs/three.module.js';
 
 
 export default function Grid3D (params = {}) {
-	let { xmin = -1.5, xmax = 1.5, 
-		ymin = -1.5, ymax = 1.5,
-		zmin = -1.5, zmax = 1.5,
+	let { xmin = -1.2, xmax = 1.2, 
+		ymin = -1.2, ymax = 1.2,
+		zmin = -1.2, zmax = 1.2,
 		xdivs = 20,	ydivs = 20, zdivs = 20 } = params;
 
 	CMap3.call(this);
@@ -70,7 +70,19 @@ export default function Grid3D (params = {}) {
 					cellFaces[wid] = faces;
 
 					const edges = [wd];
+					edges[1] = this.phi([1, 2, 1], edges[0]);
+					edges[2] = this.phi([1, 2, 1], edges[1]);
+					edges[3] = this.phi([1, 2, 1], edges[2]);
+					edges[4] = this.phi([1, 1, 2], edges[0]);
+					edges[5] = this.phi1[edges[4]];
+					edges[6] = this.phi1[edges[5]];
+					edges[7] = this.phi1[edges[6]];
+					edges[8] = this.phi_1[edges[0]];
+					edges[9] = this.phi1[edges[0]];
+					edges[10] = this.phi_1[edges[2]];
+					edges[11] = this.phi1[edges[2]];
 
+					// edges[] = this.phi1[];
 					cellEdges[wid] = edges;
 
 					const vertices = [wd];
@@ -116,7 +128,7 @@ export default function Grid3D (params = {}) {
 				}
 			}	
 		}
-		this.close();
+		this.close(true);
 		this.setEmbeddings(this.vertex);
 		const position = this.addAttribute(this.vertex, "position");
 		this.debug();
